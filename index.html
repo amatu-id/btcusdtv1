@@ -64,13 +64,16 @@ body.busy .chart{opacity:.45;filter:saturate(.6)}
 .tag{position:absolute;z-index:4;pointer-events:none;display:none;transform:translate(-50%,-100%);padding:5px 9px;border-radius:7px;white-space:nowrap;
   background:rgba(10,15,30,.86);border:1px solid var(--warn);box-shadow:0 0 0 3px rgba(242,201,76,.12);font-size:11.5px;transition:left .3s var(--ease),top .3s var(--ease)}
 .tag b{color:var(--warn);font-weight:700;margin-right:6px}
+.tag small{display:block;font-size:9.5px;color:var(--mut);letter-spacing:.04em;margin-top:2px;font-family:'JetBrains Mono',monospace}
 .tag.s{border-color:var(--dn);box-shadow:0 0 0 3px rgba(239,97,137,.12)}.tag.s b{color:var(--dn)}
+.tag.p{border-style:dashed;border-color:rgba(242,201,76,.55);box-shadow:none;background:rgba(10,15,30,.72)}
+.tag.p.s{border-color:rgba(239,97,137,.55)}
 .end{position:absolute;right:92px;bottom:8px;z-index:5;width:26px;height:26px;border-radius:7px;border:1px solid var(--line2);background:var(--s2);display:grid;place-items:center;opacity:.8;transition:opacity .2s}
 .end:hover{opacity:1}.end svg{width:13px;height:13px;stroke:var(--ink);fill:none;stroke-width:1.8}
 .err{position:absolute;inset:auto 12px 12px auto;z-index:6;background:var(--s2);border:1px solid var(--dn);border-radius:8px;padding:6px 10px;font-size:12px;display:none}
 
 /* panel */
-.side{width:var(--pw);flex:none;display:flex;flex-direction:column;gap:8px;padding:8px;border-left:1px solid var(--line);background:var(--s1);min-height:0}
+.side{width:var(--pw);flex:none;display:flex;flex-direction:column;gap:8px;padding:8px;border-left:1px solid var(--line);background:var(--s1);min-height:0;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--line2) transparent}
 .card{background:var(--s2);border:1px solid var(--line);border-radius:var(--r);padding:12px;flex:none}
 .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:11px;color:var(--mut);font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .fadein{animation:fi .35s var(--ease)}
@@ -97,11 +100,70 @@ body.busy .chart{opacity:.45;filter:saturate(.6)}
 .st div{background:var(--s1);border-radius:7px;padding:6px 8px}
 .st i{display:block;font-style:normal;font-size:10.5px;color:var(--mut)}
 .st span{font-size:13px;font-weight:600}
-.sq{display:flex;flex-wrap:wrap;gap:3px;margin-top:8px;max-height:23px;overflow:hidden;flex-direction:row-reverse;justify-content:flex-end}
-.sq b{width:8px;height:8px;border-radius:2px;background:var(--up);opacity:.85}
-.sq b.x{background:var(--dn)}.sq b.o{background:none;box-shadow:inset 0 0 0 1.5px var(--warn)}
+.sqh{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:11px;color:var(--mut)}
+.sq{display:flex;flex-wrap:wrap;gap:3px;margin-top:6px}
+.sq b,.grid b{width:10px;height:10px;border-radius:2.5px;background:var(--up);cursor:pointer;animation:pop .32s var(--ease) backwards;transition:transform .15s}
+.sq b:hover,.grid b:hover{transform:scale(1.35)}
+.sq b.x,.grid b.x{background:var(--dn)}.sq b.t,.grid b.t{opacity:.5}
+.sq b.o,.grid b.o{background:none;box-shadow:inset 0 0 0 1.5px var(--warn);animation:blink 1.2s ease-in-out infinite}
+.grid{display:flex;flex-wrap:wrap;gap:3px;padding:2px 0 10px;border-bottom:1px solid var(--line);margin-bottom:2px}
+.grid b{width:12px;height:12px}
+@keyframes pop{from{opacity:0;transform:scale(.4)}}
+@keyframes blink{50%{opacity:.35}}
+.be{font-size:11px;color:var(--mut);margin-top:6px}
+.hh{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:var(--mut);font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:4px 0 8px}
+.hh span+span{text-transform:none;letter-spacing:0;font-weight:500}
 
-.tabs{flex:1;min-height:0;display:flex;flex-direction:column;padding:0}
+/* posisi rinci */
+.dl{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:3px 0;font-size:12px}
+.dl>i{font-style:normal;color:var(--mut);flex:none}
+.dl>i em,.dl em{font-style:normal;color:var(--dim);font-size:10.5px}
+.dl>span{text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;font-weight:600;min-width:0}
+.warn{color:var(--warn)}
+.rl3{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mut)}
+/* siklus trade */
+.cy{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.stp{display:grid;grid-template-columns:repeat(4,1fr);position:relative}
+.stp::before{content:"";position:absolute;left:12.5%;right:12.5%;top:5px;height:2px;background:var(--line2)}
+.stp div{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;color:var(--dim);transition:color .3s}
+.stp .dt{width:12px;height:12px;border-radius:50%;background:var(--s3);border:2px solid var(--line2);transition:background .3s,border-color .3s}
+.stp b{font-size:10.5px;font-weight:600;margin-top:4px}
+.stp em{font-style:normal;font-size:10px;opacity:.8}
+.stp .ok{color:var(--mut)}.stp .ok .dt{background:var(--up);border-color:var(--up)}
+.stp .bad{color:var(--mut)}.stp .bad .dt{background:var(--dn);border-color:var(--dn)}
+.stp .on{color:var(--ink)}.stp .on .dt{background:var(--warn);border-color:var(--warn);animation:pl 1.4s ease-out infinite}
+.stp .on.up .dt{background:var(--up);border-color:var(--up);--pc:46,196,166}.stp .on.dn .dt{background:var(--dn);border-color:var(--dn);--pc:239,97,137}
+@keyframes pl{0%{box-shadow:0 0 0 0 rgba(var(--pc,242,201,76),.6)}100%{box-shadow:0 0 0 9px rgba(var(--pc,242,201,76),0)}}
+.cy .bar{position:relative;height:6px;border-radius:6px;background:var(--s1);margin-top:10px;overflow:hidden}
+.cy .bar i{position:absolute;top:0;bottom:0;border-radius:6px;transition:width .7s var(--ease)}
+.cy .bar i.w{background:linear-gradient(90deg,rgba(242,201,76,.25),var(--warn))}
+.cy .bar i.go{background-image:linear-gradient(90deg,var(--warn),#fff1bd,var(--warn));background-size:200% 100%;animation:flow 1.2s linear infinite}
+.cy .bar i.g{background:linear-gradient(90deg,rgba(46,196,166,.4),var(--up))}.cy .bar i.r{background:linear-gradient(270deg,rgba(239,97,137,.4),var(--dn))}
+.cy .bar .mid{position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--ink);opacity:.7}
+@keyframes flow{to{background-position:-200% 0}}
+.cy .msg{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;margin-top:6px}
+.cy .msg.mut{font-size:11px;margin-top:2px}
+/* matriks akurasi */
+.mx{display:grid;grid-template-columns:minmax(0,1fr) repeat(5,40px);gap:3px;align-items:center;font-size:11px}
+.mx .h{color:var(--mut);text-align:center;font-weight:600;font-size:10.5px;padding-bottom:2px;border-bottom:2px solid var(--acc)}
+.mx .h.swing{border-color:#8d7bd6}
+.mx .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:4px}
+.mx .c{height:30px;border:0;border-radius:5px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;font-size:11.5px;line-height:1.05;
+  font-family:'JetBrains Mono',monospace;animation:pop .35s var(--ease) backwards;transition:transform .15s,box-shadow .2s;color:var(--ink);padding:0}
+.mx .c i{font-style:normal;font-size:9px;opacity:.7;font-weight:500}
+.mx .c.g{background:rgba(46,196,166,var(--a))}.mx .c.r{background:rgba(239,97,137,var(--a))}.mx .c.a{background:rgba(242,201,76,.2)}
+.mx .c.z{background:var(--s1);color:var(--dim)}
+.mx .c:hover{transform:scale(1.07)}.mx .c.on{box-shadow:0 0 0 2px var(--ink)}
+.lg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:11px;color:var(--mut)}
+.lg b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.lg b.g{background:var(--up)}.lg b.a{background:rgba(242,201,76,.6)}.lg b.r{background:var(--dn)}
+.tr{cursor:pointer;transition:background .2s}.tr:hover{background:rgba(91,140,255,.05)}
+.seg .gap{width:1px;align-self:stretch;margin:4px 3px;background:var(--line2);flex:none}
+#fitBtn{width:auto;padding:0 9px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:600}
+#fitBtn.spin svg{animation:fitA .5s var(--ease)}
+@keyframes fitA{50%{transform:scale(.7)}}
+
+.tabs{flex:1 0 340px;min-height:0;display:flex;flex-direction:column;padding:0}
 .tb{position:relative;display:flex;border-bottom:1px solid var(--line);flex:none}
 .tb button{flex:1;border:0;background:none;padding:10px 0 9px;font-size:12px;font-weight:600;color:var(--mut);transition:color .2s}
 .tb button.on{color:var(--ink)}
@@ -115,7 +177,7 @@ body.busy .chart{opacity:.45;filter:saturate(.6)}
 .tr .b{font-size:10px;font-weight:700;text-align:center;border-radius:4px;padding:2px 0}
 .tr .b.tp{background:rgba(46,196,166,.14);color:var(--up)}.tr .b.sl{background:rgba(239,97,137,.14);color:var(--dn)}.tr .b.op{background:rgba(242,201,76,.13);color:var(--warn)}
 .tr .m{font-size:12px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tr .m i{font-style:normal;color:var(--mut);font-size:11px;display:block}
+.tr .m i{font-style:normal;color:var(--mut);font-size:11px;display:block;white-space:normal;line-height:1.35}
 .tr .r{text-align:right;font-size:12px;font-weight:600}
 .tr .r i{display:block;font-style:normal;font-size:11px;color:var(--mut);font-weight:500}
 .empty{color:var(--mut);padding:14px 2px}
@@ -168,14 +230,20 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
   .seg button{padding:0 5px;font-size:11.5px}
   .app{flex-direction:column}
   .chart{flex:1.15}
-  .side{width:auto;flex:1;border-left:0;border-top:1px solid var(--line);padding:0;gap:0}
+  .side{width:auto;flex:1;border-left:0;border-top:1px solid var(--line);padding:0;gap:0;overflow:hidden}
   .side>.card:not(.tabs){display:none}
   .dw{border:0;background:none;padding:0}
-  .tabs{border:0;border-radius:0;background:var(--s1)}
+  .tabs{border:0;border-radius:0;background:var(--s1);flex:1;min-height:0}
+  .tb{overflow-x:auto;scrollbar-width:none}.tb::-webkit-scrollbar{display:none}
+  .tb button{flex:none;padding:10px 11px 9px}
   .tb .mo{display:block}
+  #fitBtn span{display:none}
+  .end{width:32px;height:32px;opacity:.95}
+  .mx{grid-template-columns:minmax(0,1fr) repeat(5,minmax(38px,52px))}
   .end{right:84px}
   .pn.b{flex:1.5}.pn.c{display:none}
 }
+@media (max-width:480px){#fitBtn,.seg .gap{display:none}}
 @media (max-height:760px) and (min-width:821px){#eqc{height:40px}.card{padding:10px}.kv{gap:6px 12px}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
@@ -185,6 +253,7 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
   <div class="brand">BTCUSDT <span>v1</span></div>
   <select id="sym" class="ctl" aria-label="Simbol"></select>
   <div class="seg" id="tfs"><span class="ind"></span></div>
+  <button class="icon" id="fitBtn" aria-label="Auto" title="Auto: kembali ke bar terakhir & skala harga 100%"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span>Auto</span></button>
   <select id="preset" class="ctl" aria-label="Preset"></select>
   <div class="sp"></div>
   <div class="quote"><span class="dot off" id="dot"></span><span class="p num" id="px">—</span><span class="c num" id="pc"></span></div>
@@ -196,9 +265,9 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
 <div class="app">
   <section class="chart">
     <div class="pn a"><div class="lc" id="c1"></div><canvas id="ov"></canvas><div class="lab" id="lab1"></div><div class="tag" id="tag"></div>
-      <button class="end" id="end" aria-label="Ke bar terakhir"><svg viewBox="0 0 24 24"><path d="M6 6l6 6-6 6M14 6l6 6-6 6"/></svg></button></div>
+      <button class="end" id="end" aria-label="Auto" title="Auto: kembali ke bar terakhir & skala harga 100%"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
     <div class="pn b"><div class="lc" id="c2"></div><div class="lab">MACD 12 26 9</div></div>
-    <div class="pn c"><div class="lc" id="c3"></div><div class="lab">RSI 14</div></div>
+    <div class="pn c"><div class="lc" id="c3"></div><div class="lab" id="lab3">RSI 14</div></div>
     <div class="err" id="err"></div>
   </section>
 
@@ -209,13 +278,14 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
     <div class="card tabs">
       <div class="tb" id="tb">
         <button class="mo" data-t="dewa">Dewa</button><button class="mo" data-t="pos">Posisi</button><button class="mo" data-t="eq">Ekuitas</button>
-        <button data-t="hist">Riwayat</button><button data-t="val">Uji</button><button data-t="rule">Aturan</button><span class="ind"></span>
+        <button data-t="hist">Riwayat</button><button data-t="acc">Akurasi</button><button data-t="val">Uji</button><button data-t="rule">Aturan</button><span class="ind"></span>
       </div>
       <div class="body">
         <div class="sec" data-s="dewa" id="mDewa"></div>
         <div class="sec" data-s="pos" id="mPos"></div>
         <div class="sec" data-s="eq" id="mEq"></div>
         <div class="sec" data-s="hist" id="sHist"></div>
+        <div class="sec" data-s="acc" id="sAcc"></div>
         <div class="sec" data-s="val" id="sVal"></div>
         <div class="sec" data-s="rule" id="sRule"></div>
       </div>
@@ -256,7 +326,12 @@ const TFMS={'15m':9e5,'30m':18e5,'1h':36e5,'4h':144e5,'1d':864e5};
 /* sinyal dibaca di close bar i → entry di open bar i+1 */
 const up=(X,i)=>X.c[i]>X.e200[i]&&X.e50[i]>X.e200[i], dw=(X,i)=>X.c[i]<X.e200[i]&&X.e50[i]<X.e200[i];
 const htf=(X,i)=>up(X,i)&&X.c[i]>X.e800[i]&&X.e200[i]>X.e800[i], atrp=(X,i)=>X.atr[i]/X.c[i];
+const htfD=(X,i)=>dw(X,i)&&X.c[i]<X.e800[i]&&X.e200[i]<X.e800[i];
 const ENTRIES={
+  sc_stoch10:{n:'Stoch dip · tren ganda',s:'Stoch<10 tren',r:'Close & EMA50 > EMA200 > EMA800, Stochastic %K(14) < 10, ATR ≥ 0,5% harga',f:(X,i)=>htf(X,i)&&X.stk[i]<10&&atrp(X,i)>=.005?1:0},
+  sc_stoch5:{n:'Stoch ekstrem · tren ganda',s:'Stoch<5 tren',r:'Close & EMA50 > EMA200 > EMA800, Stochastic %K(14) < 5, ATR ≥ 0,5% harga',f:(X,i)=>htf(X,i)&&X.stk[i]<5&&atrp(X,i)>=.005?1:0},
+  sw_rsi2:{n:'RSI2 swing · tren ganda',s:'RSI2 swing L/S',r:'Long: close & EMA50 > EMA200 > EMA800, RSI(2) < 5 · Short: semua terbalik, RSI(2) > 95',f:(X,i)=>htf(X,i)&&X.rsi2[i]<5?1:htfD(X,i)&&X.rsi2[i]>95?-1:0},
+  sw_dn3:{n:'3 close turun di atas EMA200',s:'3 turun > EMA200',r:'Close > EMA200 dan tiga close berturut-turut lebih rendah',f:(X,i)=>X.c[i]>X.e200[i]&&X.c[i]<X.c[i-1]&&X.c[i-1]<X.c[i-2]&&X.c[i-2]<X.c[i-3]?1:0},
   hist_rise:{n:'MACD histogram naik',r:'Histogram MACD naik / turun dari bar sebelumnya',f:(X,i)=>X.hi[i]>X.hi[i-1]?1:X.hi[i]<X.hi[i-1]?-1:0},
   rsi2_trend:{n:'RSI2 pullback tren',r:'Tren naik (close & EMA50 > EMA200), RSI(2) < 10 · short kebalikannya (> 90)',f:(X,i)=>up(X,i)&&X.rsi2[i]<10?1:dw(X,i)&&X.rsi2[i]>90?-1:0},
   rsi2_htf3:{n:'RSI2 dip · tren ganda',r:'Close & EMA50 > EMA200 > EMA800, RSI(2) < 3, ATR ≥ 0,3% harga',f:(X,i)=>htf(X,i)&&X.rsi2[i]<3&&atrp(X,i)>=.003?1:0},
@@ -291,10 +366,30 @@ const DEWA={
 };
 const RISET={ // backtest skrip riset: n trade, WR 60% awal / 40% akhir, WR ETH, rentang
   '15m':[132,87,90,83,'2,5 thn'],'30m':[161,71,72,73,'3,5 thn'],'1h':[273,68,69,69,'6 thn'],'4h':[874,73,70,71,'2017–2026'],'1d':[160,76,74,74,'2017–2026']};
-const presetFor=(id,tf)=>Object.assign({},id==='optimal'?OPTIMAL[tf]:id==='dewa'?DEWA[tf]:DEFAULT);
+/* Scalping 15m–1H & Swing 4H–1D: dipilih dari 54.600 (scalp) / 14.560 (swing) kombinasi per TF.
+   Lolos hanya bila BTC 60% awal, BTC 40% akhir, ETH, dan SOL semuanya untung setelah fee; diurutkan dari win rate terendah di keempatnya. */
+const SCALP={
+  '15m':Object.assign({},BASE,{entry:'rsi2_htf3',dir:'L',tpk:1,slk:4,mb:0,per:0}),
+  '30m':Object.assign({},BASE,{entry:'sc_stoch10',dir:'L',tpk:.5,slk:4,mb:0,per:0}),
+  '1h':Object.assign({},BASE,{entry:'sc_stoch5',dir:'L',tpk:.5,slk:2,mb:0,per:0})
+};
+const SWING={
+  '4h':Object.assign({},BASE,{entry:'sw_rsi2',dir:'LS',tpk:.5,slk:4,mb:0,per:0}),
+  '1d':Object.assign({},BASE,{entry:'sw_dn3',dir:'L',tpk:.5,slk:4,mb:0,per:0})
+};
+const RISET2={ // rentang BTC, lalu [trade, WR%] untuk BTC awal 60% / BTC akhir 40% / ETH / SOL
+  '15m':['2024–2026',[82,87],[49,90],[230,83],[277,87]],'30m':['2023–2026',[104,96],[34,94],[266,93],[475,92]],
+  '1h':['2020–2026',[69,81],[54,89],[145,85],[235,83]],'4h':['2017–2026',[174,90],[123,93],[327,90],[212,90]],
+  '1d':['2019–2026',[35,94],[37,92],[60,92],[37,89]]};
+const GRP=tf=>tf==='4h'||tf==='1d'?'swing':'scalp';
+const PNAME={scalp:'Scalping',swing:'Swing',dewa:'Mata Dewa',optimal:'Optimal',default:'Default',custom:'Kustom'};
+const presetFor=(id,tf)=>Object.assign({},id==='scalp'?SCALP[tf]||SCALP['30m']:id==='swing'?SWING[tf]||SWING['4h']:id==='optimal'?OPTIMAL[tf]:id==='dewa'?DEWA[tf]:DEFAULT);
+const w0=n=>Math.min(801,Math.max(201,n>>2)); // pemanasan EMA800
 
-let S=Object.assign({sym:'BTCUSDT',tf:'1d',preset:'default',tab:'hist',eye:true},LS.get('s2',{}));
-if(!TFMS[S.tf])S.tf='1d';
+let S=Object.assign({sym:'BTCUSDT',tf:'30m',tab:'hist',eye:true},LS.get('s2',{}),LS.get('s3',{}));
+if(!TFMS[S.tf])S.tf='30m';
+if(!LS.get('s3',null))S.preset=GRP(S.tf);
+if(S.preset==='scalp'||S.preset==='swing')S.preset=GRP(S.tf);
 let P=S.preset==='custom'?Object.assign({},DEFAULT,LS.get('custom',{})):presetFor(S.preset,S.tf);
 let D=[],X=null,BT=null,pollT=null,seq=0,lastEq=null,DW=null,dwKey='',dwSeq=0;
 
@@ -311,25 +406,26 @@ function calc(d){
   const bbl=[],bbu=[];
   for(let i=0;i<c.length;i++){const a=Math.max(0,i-19);let sm=0,q=0;for(let j=a;j<=i;j++)sm+=c[j];const mu=sm/(i-a+1);for(let j=a;j<=i;j++)q+=(c[j]-mu)**2;const sd=Math.sqrt(q/(i-a+1));
     const ma=i>=19?mu:sm/20;bbl.push(ma-2*sd);bbu.push(ma+2*sd)}
-  return {o,h,l,c,atr:rma(tr,14),m,s,hi:m.map((x,i)=>x-s[i]),rsi:r14,rsi2:r2,e20:ema(c,20),e50:ema(c,50),e200:ema(c,200),e800:ema(c,800),bbl,bbu,
+  const stk=c.map((x,i)=>{if(i<13)return 50;let H=-Infinity,L=Infinity;for(let j=i-13;j<=i;j++){if(h[j]>H)H=h[j];if(l[j]<L)L=l[j]}return H>L?(x-L)/(H-L+1e-12)*100:50});
+  return {o,h,l,c,atr:rma(tr,14),m,s,hi:m.map((x,i)=>x-s[i]),rsi:r14,rsi2:r2,stk,e20:ema(c,20),e50:ema(c,50),e200:ema(c,200),e800:ema(c,800),bbl,bbu,
     e12,e26,ag14:RS[14][0],al14:RS[14][1],ag2:RS[2][0],al2:RS[2][1]};
 }
 
 /* backtest — sama dengan skrip riset */
-function backtest(p,from,to,live){
-  const sig=ENTRIES[p.entry].f,lev=p.lev,fee=p.fee/100;
-  let eq=p.cap,peak=eq,mdd=0,streak=0,i=Math.max(from,201),open=null;const T=[],curve=[eq];
+function backtest(p,from,to,live,Z){
+  Z=Z||X;const sig=ENTRIES[p.entry].f,lev=p.lev,fee=p.fee/100;
+  let eq=p.cap,peak=eq,mdd=0,streak=0,i=Math.max(from,w0(Z.c.length)),open=null;const T=[],curve=[eq];
   while(i<to-1){
-    let s=sig(X,i);if(p.dir==='L'&&s<0)s=0;
+    let s=sig(Z,i);if(p.dir==='L'&&s<0)s=0;
     if(!s){i++;continue}
-    const e=X.o[i+1],a=X.atr[i],tp=e+s*p.tpk*a,sl=e-s*p.slk*a,mg=(p.lad&&streak>=p.ladn?p.ladm:p.mg)/100;
+    const e=Z.o[i+1],a=Z.atr[i],tp=e+s*p.tpk*a,sl=e-s*p.slk*a,mg=(p.lad&&streak>=p.ladn?p.ladm:p.mg)/100;
     let j=i+1,res=null;
     for(;j<to;j++){
-      const hs=s>0?X.l[j]<=sl:X.h[j]>=sl,ht=s>0?X.h[j]>=tp:X.l[j]<=tp;
+      const hs=s>0?Z.l[j]<=sl:Z.h[j]>=sl,ht=s>0?Z.h[j]>=tp:Z.l[j]<=tp;
       if(live&&j===to-1&&!hs&&!ht)break;
       if(hs){res=['SL',sl];break}
       if(ht){res=['TP',tp];break}
-      if(p.mb&&j-i>=p.mb&&!(live&&j===to-1)){res=['T',X.c[j]];break}
+      if(p.mb&&j-i>=p.mb&&!(live&&j===to-1)){res=['T',Z.c[j]];break}
     }
     const b={dir:s,si:i,ei:i+1,entry:e,tp,sl,atr:a,mg,eq0:eq,lad:mg*100>p.mg};
     if(!res){if(live)open=b;break}
@@ -347,7 +443,7 @@ const HOSTS=['https://data-api.binance.vision','https://api.binance.com'];
 async function kl(q){let er;for(const h of HOSTS){try{const r=await fetch(h+'/api/v3/klines?'+q,{cache:'no-store'});if(r.ok)return r.json();er=new Error('HTTP '+r.status)}catch(e){er=e}}throw er}
 const bar=r=>({t:r[0],o:+r[1],h:+r[2],l:+r[3],c:+r[4]});
 async function loadAll(sym,tf){
-  const ms=TFMS[tf],now=Date.now(),K=5;
+  const ms=TFMS[tf],now=Date.now(),K=tf==='15m'||tf==='30m'?10:5; // scalping TF butuh riwayat lebih panjang
   const parts=await Promise.all([...Array(K)].map((_,k)=>kl(`symbol=${sym}&interval=${tf}&limit=1000&startTime=${Math.floor(now-(K-k)*1000*ms)}`).catch(()=>[])));
   const m=new Map();parts.flat().forEach(r=>m.set(r[0],r));
   return [...m.values()].sort((a,b)=>a[0]-b[0]).map(bar);
@@ -368,7 +464,13 @@ const eA=ln(c1,'rgba(91,140,255,.55)'),eB=ln(c1,'rgba(141,123,214,.55)'),eC=ln(c
 const bU=ln(c1,'rgba(139,149,181,.35)'),bL=ln(c1,'rgba(139,149,181,.35)');
 const mh=c2.addHistogramSeries({priceLineVisible:false,lastValueVisible:false}),mm=ln(c2,'#5b8cff',1.5),msg=ln(c2,'#f2994a',1.5);
 const rs=c3.addLineSeries({color:'#8d7bd6',lineWidth:1.5,priceLineVisible:false});
-[70,30].forEach(v=>rs.createPriceLine({price:v,color:'rgba(139,149,181,.35)',lineWidth:1,lineStyle:2,axisLabelVisible:false}));
+const rsl=[70,30].map(v=>rs.createPriceLine({price:v,color:'rgba(139,149,181,.35)',lineWidth:1,lineStyle:2,axisLabelVisible:false}));
+function osc(){ // panel bawah mengikuti osilator yang dipakai entry
+  const e=P.entry==='dewa'?P.base||'':P.entry;
+  if(e.startsWith('sc_stoch'))return{k:'stk',n:'Stochastic %K 14',lv:e==='sc_stoch5'?[95,5]:[90,10]};
+  if(e.startsWith('rsi2')||e==='sw_rsi2')return{k:'rsi2',n:'RSI 2',lv:e==='rsi2_htf3'?[97,3]:e==='rsi2_trend'?[90,10]:[95,5]};
+  return{k:'rsi',n:'RSI 14',lv:e==='rsi14_dip'?[65,35]:[70,30]};
+}
 let pls=[],sync=false;
 [c1,c2,c3].forEach(a=>a.timeScale().subscribeVisibleLogicalRangeChange(r=>{if(sync||!r)return;sync=true;[c1,c2,c3].forEach(b=>b!==a&&b.timeScale().setVisibleLogicalRange(r));sync=false;drawOv()}));
 const tz=t=>Math.floor(t/1000)+7*3600;
@@ -384,11 +486,12 @@ function fill(keep){
   cs.applyOptions({priceFormat:pf});
   cs.setData(D.map((b,i)=>({time:T[i],open:b.o,high:b.h,low:b.l,close:b.c})));
   const L=(on,a,from=0)=>on?a.map((v,i)=>({time:T[i],value:v})).slice(from):[];
-  const e=P.entry,tr=['trend200','rsi2_htf3','rsi2_htf5','rsi2_trend','rsi2_trend5','rsi14_dip','bb_trend','pull_e20'].includes(e),bb=e.startsWith('bb_');
+  const e=P.entry,tr=['trend200','rsi2_htf3','rsi2_htf5','rsi2_trend','rsi2_trend5','rsi14_dip','bb_trend','pull_e20','sc_stoch10','sc_stoch5','sw_rsi2','sw_dn3'].includes(e),bb=e.startsWith('bb_');
   eA.setData(L(e==='trend200'||e==='pull_e20',X.e20));eB.setData(L(tr&&e!=='trend200'?true:e==='trend200',X.e50));eC.setData(L(tr,X.e200,200));
   bU.setData(L(bb,X.bbu,20));bL.setData(L(bb,X.bbl,20));
   mh.setData(D.map((b,i)=>{const v=X.hi[i],k=i&&v>X.hi[i-1];return{time:T[i],value:v,color:v>=0?(k?UP:'rgba(46,196,166,.4)'):(k?'rgba(239,97,137,.4)':DN)}}));
-  mm.setData(L(true,X.m));msg.setData(L(true,X.s));rs.setData(D.map((b,i)=>i<15?{time:T[i]}:{time:T[i],value:X.rsi[i]}));
+  const O=osc();$('lab3').textContent=O.n;rsl.forEach((l,k)=>l.applyOptions({price:O.lv[k]}));
+  mm.setData(L(true,X.m));msg.setData(L(true,X.s));rs.setData(D.map((b,i)=>i<15?{time:T[i]}:{time:T[i],value:X[O.k][i]}));
   markers();posLines();
   if(r)[c1,c2,c3].forEach(c=>c.timeScale().setVisibleLogicalRange(r));
 }
@@ -403,8 +506,8 @@ function markers(){
 }
 function posLines(){ // tiga garis tetap, hanya diperbarui (hapus-buat ulang memicu error render di LWC)
   if(!pls.length)[[UP,'TP',0],['#c9d1e8','Entry',2],[DN,'SL',0]].forEach(([c,t,st])=>pls.push(cs.createPriceLine({price:0,color:c,lineWidth:1,lineStyle:st,title:t,lineVisible:false,axisLabelVisible:false})));
-  const o=BT.open,v=[o&&o.tp,o&&o.entry,o&&o.sl];
-  pls.forEach((l,k)=>l.applyOptions(o?{price:v[k],lineVisible:true,axisLabelVisible:true,title:['TP','Entry','SL'][k]}:{lineVisible:false,axisLabelVisible:false,title:''}));
+  const o=BT.open,q=o||PL,v=q?[q.tp,o?o.entry:PL.px,q.sl]:[];
+  pls.forEach((l,k)=>l.applyOptions(q?{price:v[k],lineVisible:true,axisLabelVisible:true,lineStyle:o?(k===1?2:0):2,title:o?['TP','Entry','SL'][k]:['TP?','Entry?','SL?'][k]}:{lineVisible:false,axisLabelVisible:false,title:''}));
 }
 
 /* overlay */
@@ -417,17 +520,35 @@ function paint(){
   if(!BT||!D.length){tg.style.display='none';return}
   const ts=c1.timeScale(),bs=ts.options().barSpacing,pw=W-(c1.priceScale('right').width()||80);
   ox.save();ox.beginPath();ox.rect(0,0,pw,H);ox.clip();
-  const box=(i0,i1,e,tp,sl,live)=>{
-    const x0=ts.logicalToCoordinate(i0),x1=ts.logicalToCoordinate(i1);if(x0==null||x1==null)return;
+  const hl=(a,b,y,col,dash)=>{ox.setLineDash(dash||[]);ox.strokeStyle=col;ox.beginPath();ox.moveTo(a,Math.round(y)+.5);ox.lineTo(b,Math.round(y)+.5);ox.stroke();ox.setLineDash([])};
+  const box=(t,i1,mode)=>{ // mode 0 lama · 1 baru/terpilih · 2 berjalan
+    const x0=ts.logicalToCoordinate(t.ei),x1=ts.logicalToCoordinate(i1);if(x0==null||x1==null)return;
     const a=x0-bs/2,b=x1+bs/2;if(b<0||a>pw)return;
-    const ye=cs.priceToCoordinate(e),yt=cs.priceToCoordinate(tp),yl=cs.priceToCoordinate(sl);if(ye==null)return;
-    ox.fillStyle=live?'rgba(46,196,166,.14)':'rgba(46,196,166,.07)';ox.fillRect(a,Math.min(ye,yt),b-a,Math.abs(yt-ye));
-    ox.fillStyle=live?'rgba(239,97,137,.14)':'rgba(239,97,137,.07)';ox.fillRect(a,Math.min(ye,yl),b-a,Math.abs(yl-ye));
+    const ye=cs.priceToCoordinate(t.entry),yt=cs.priceToCoordinate(t.tp),yl=cs.priceToCoordinate(t.sl);if(ye==null||yt==null||yl==null)return;
+    const f=[.06,.11,.15][mode],al=[.45,.85,1][mode];
+    ox.fillStyle=`rgba(46,196,166,${f})`;ox.fillRect(a,Math.min(ye,yt),b-a,Math.abs(yt-ye));
+    ox.fillStyle=`rgba(239,97,137,${f})`;ox.fillRect(a,Math.min(ye,yl),b-a,Math.abs(yl-ye));
+    ox.lineWidth=mode?1.2:1;hl(a,b,yt,`rgba(46,196,166,${al})`);hl(a,b,yl,`rgba(239,97,137,${al})`);hl(a,b,ye,`rgba(201,209,232,${al*.8})`,[4,3]);
+    if(mode&&b-a>46){ox.font='600 9.5px Inter';ox.textAlign='left';
+      ox.fillStyle=`rgba(46,196,166,${al})`;ox.fillText('TP '+fp(t.tp),a+3,yt+(yt<ye?-3:10));
+      ox.fillStyle=`rgba(239,97,137,${al})`;ox.fillText('SL '+fp(t.sl),a+3,yl+(yl<ye?-3:10))}
   };
-  BT.T.forEach(t=>box(t.ei,t.xi,t.entry,t.tp,t.sl,false));
-  const last=D.length-1,xl=ts.logicalToCoordinate(last);
-  if(BT.open)box(BT.open.ei,last+3,BT.open.entry,BT.open.tp,BT.open.sl,true);
-  if(xl!=null&&xl>-bs&&xl<pw+bs){ox.fillStyle='rgba(91,140,255,.07)';ox.fillRect(xl-bs/2,0,bs,H);ox.setLineDash([2,4]);ox.strokeStyle='rgba(201,209,232,.35)';ox.beginPath();ox.moveTo(xl+.5,0);ox.lineTo(xl+.5,H);ox.stroke();ox.setLineDash([])}
+  const nT=BT.T.length;BT.T.forEach((t,k)=>box(t,t.xi,t===HL||k>=nT-3?1:0));
+  const last=D.length-1,xl=ts.logicalToCoordinate(last),now=performance.now();
+  if(xl!=null&&xl>-bs&&xl<pw+bs){ox.fillStyle='rgba(139,149,181,.10)';ox.fillRect(xl-bs/2-2,0,bs+4,H);ox.setLineDash([2,4]);ox.strokeStyle='rgba(201,209,232,.45)';ox.beginPath();ox.moveTo(xl+.5,0);ox.lineTo(xl+.5,H);ox.stroke();ox.setLineDash([])}
+  if(BT.open){const o=BT.open;box(o,last+3,2);
+    const xe=ts.logicalToCoordinate(o.ei),ye=cs.priceToCoordinate(o.entry),yc=cs.priceToCoordinate(D[last].c);
+    if(xe!=null&&ye!=null&&yc!=null&&xl!=null){const win=o.dir*(D[last].c-o.entry)>=0,col=win?'46,196,166':'239,97,137';
+      ox.setLineDash([3,3]);ox.strokeStyle=`rgba(${col},.9)`;ox.lineWidth=1.5;ox.beginPath();ox.moveTo(xe,ye);ox.lineTo(xl,yc);ox.stroke();ox.setLineDash([]);
+      const k=(now%1400)/1400;ox.fillStyle=`rgba(${col},${.5*(1-k)})`;ox.beginPath();ox.arc(xl,yc,4+k*12,0,7);ox.fill();
+      ox.fillStyle=`rgb(${col})`;ox.beginPath();ox.arc(xl,yc,3.5,0,7);ox.fill()}}
+  if(!BT.open&&PL){ // zona rencana untuk sinyal berikutnya
+    const x0=ts.logicalToCoordinate(last),x1=ts.logicalToCoordinate(last+(S.eye?PH:5)),Y=v=>cs.priceToCoordinate(v);
+    if(x0!=null&&x1!=null){const ye=Y(PL.px),yt=Y(PL.tp),yl=Y(PL.sl);
+      if(ye!=null&&yt!=null&&yl!=null){const k=PL.now?.5+.5*Math.sin(now/260):1;
+        ox.fillStyle=`rgba(46,196,166,${.07*k+.02})`;ox.fillRect(x0,Math.min(ye,yt),x1-x0,Math.abs(yt-ye));ox.fillStyle=`rgba(239,97,137,${.07*k+.02})`;ox.fillRect(x0,Math.min(ye,yl),x1-x0,Math.abs(yl-ye));
+        ox.lineWidth=1;[[yt,'rgba(46,196,166,.9)','TP'],[ye,'rgba(242,201,76,.95)','ENTRY'],[yl,'rgba(239,97,137,.9)','SL']].forEach(([y,col,t])=>{hl(x0,x1,y,col,[5,4]);ox.fillStyle=col;ox.font='600 10px Inter';ox.textAlign='right';ox.fillText(t,x1-2,y-4);ox.textAlign='left'})}}
+  }
   if(S.eye&&DW&&DW.L===D.length-2){
     const L=DW.L,c=X.c[L],pts=h=>ts.logicalToCoordinate(L+h),Y=v=>cs.priceToCoordinate(v);
     const up=[[pts(0),Y(c)]],dn=[[pts(0),Y(c)]],md=[[pts(0),Y(c)]];
@@ -439,63 +560,101 @@ function paint(){
       const e=md[PH];ox.fillStyle='#8caaff';ox.beginPath();ox.arc(e[0],e[1],3,0,7);ox.fill();
       ox.font='600 11px Inter';ox.textAlign='right';ox.fillText(fp(DW.q[1][PH-1]*c),e[0]-6,e[1]-6);ox.textAlign='left';
     }
-    if(!BT.open&&PL){
-      const x0=ts.logicalToCoordinate(D.length-1),x1=ts.logicalToCoordinate(D.length-1+PH);
-      if(x0!=null&&x1!=null){[[PL.tp,'rgba(46,196,166,.9)','TP'],[PL.px,'rgba(242,201,76,.95)','ENTRY'],[PL.sl,'rgba(239,97,137,.9)','SL']].forEach(([v,col,t])=>{
-        const y=Y(v);if(y==null)return;ox.setLineDash([5,4]);ox.strokeStyle=col;ox.lineWidth=1;ox.beginPath();ox.moveTo(x0,y);ox.lineTo(x1,y);ox.stroke();ox.setLineDash([]);
-        ox.fillStyle=col;ox.font='600 10px Inter';ox.textAlign='right';ox.fillText(t,x1-2,y-4);ox.textAlign='left'});
-        const ye=Y(PL.px),yt=Y(PL.tp),yl=Y(PL.sl);if(ye!=null&&yt!=null&&yl!=null){ox.fillStyle='rgba(46,196,166,.06)';ox.fillRect(x0,Math.min(ye,yt),x1-x0,Math.abs(yt-ye));ox.fillStyle='rgba(239,97,137,.06)';ox.fillRect(x0,Math.min(ye,yl),x1-x0,Math.abs(yl-ye))}}
-    }
   }
   ox.restore();
-  const o=BT.open;
-  if(o&&xl!=null&&xl>0&&xl<pw+40){
-    tg.className='tag'+(o.dir<0?' s':'');tg.innerHTML=`<b>${o.dir>0?'LONG':'SHORT'}</b><span class="num">${fp(o.entry)}</span>`;tg.style.display='block';
-    const y=cs.priceToCoordinate(o.dir>0?o.tp:o.sl),w=tg.offsetWidth;
-    tg.style.left=Math.min(Math.max(xl,w/2+8),pw-w/2-4)+'px';tg.style.top=Math.max((y==null?50:y)-10,tg.offsetHeight+6)+'px';
+  const o=BT.open,q=o||PL;
+  if(q&&xl!=null&&xl>0&&xl<pw+40){
+    const ref=o?o.dir:PL.dir,cmp=PL&&!o?(PL.px<D[last].c?'≤ ':'≥ '):'';
+    const h=o?`<b>${o.dir>0?'LONG':'SHORT'}</b><span class="num">${fp(o.entry)}</span><small>MARGIN ${Math.round(o.mg*100)}% · ${P.lev}X · TP ${fp(o.tp)} · SL ${fp(o.sl)}</small>`
+      :`<b>${PL.now?'SIAP':'RENCANA'} ${PL.dir>0?'LONG':'SHORT'}</b><span class="num">${PL.now?'':cmp}${fp(PL.px)}</span><small>MARGIN ${P.mg}% · ${P.lev}X · TP ${fp(PL.tp)} · SL ${fp(PL.sl)}</small>`;
+    const cls='tag'+(o?'':' p')+(ref<0?' s':'');if(tg.className!==cls)tg.className=cls;if(tg._h!==h){tg.innerHTML=h;tg._h=h}tg.style.display='block';
+    const y=cs.priceToCoordinate(o?(o.dir>0?o.tp:o.sl):(PL.dir>0?PL.tp:PL.sl)),w=tg.offsetWidth;
+    tg.style.left=Math.min(Math.max(xl-w/2-14,w/2+8),pw-w/2-4)+'px';tg.style.top=Math.max((y==null?50:y)-12,tg.offsetHeight+6)+'px';
   }else tg.style.display='none';
 }
-new ResizeObserver(()=>{drawOv();if(BT)curve($('eqc'))}).observe(document.body);
-setInterval(drawOv,500);
+new ResizeObserver(()=>{drawOv();if(BT)document.querySelectorAll('[data-c]').forEach(curve)}).observe(document.body);
+setInterval(drawOv,120);
 
 /* panel */
 const sigTxt=s=>s>0?'<span class="pill l">LONG</span>':s<0?'<span class="pill s">SHORT</span>':'<span class="pill n">—</span>';
+const dl=(k,v)=>`<div class="dl"><i>${k}</i><span>${v}</span></div>`;
+let HL=null,hlT=0;
+/* siklus trade: Tunggu → Open → Take profit / Stop loss */
+function cyState(){
+  const n=D.length,l=D[n-1],o=BT.open,a=X.atr[n-2],lt=BT.T[BT.T.length-1],ago=lt?n-1-lt.xi:1e9;
+  if(o){const d=o.dir*(l.c-o.entry),k=d>=0?Math.min(1,d/Math.abs(o.tp-o.entry)):-Math.min(1,-d/Math.abs(o.entry-o.sl));
+    return{ph:2,k,msg:d>=0?`<b class="up">${Math.round(k*100)}%</b> menuju take profit`:`<b class="dn">${Math.round(-k*100)}%</b> menuju stop loss`,sub:`${n-1-o.si} bar berjalan · TP ${fp(o.tp)} · SL ${fp(o.sl)}`}}
+  const base={lt,ago};
+  if(PL&&PL.now)return Object.assign(base,{ph:1,k:1,msg:`<b class="warn">Open ${PL.dir>0?'LONG':'SHORT'}</b> di open bar berikutnya`,sub:'bila bar ini ditutup di sekitar harga sekarang'});
+  if(PL){const dist=Math.abs(l.c-PL.px)/a;return Object.assign(base,{ph:0,k:Math.max(.04,1-dist/4),msg:`Open ${PL.dir>0?'LONG':'SHORT'} jika close ${PL.px<l.c?'≤':'≥'} <b class="num">${fp(PL.px)}</b>`,sub:`jarak ${pc(PL.px/l.c-1)} · ${dist.toFixed(1)} ATR`})}
+  return Object.assign(base,{ph:0,k:0,msg:'Menunggu sinyal',sub:'belum ada pemicu dalam ±4 ATR'});
+}
+function cyHTML(){
+  const c=cyState(),r=c.ph<2&&c.lt&&c.ago<=6?c.lt:null;
+  const st=(cls,lab,sub)=>`<div class="${cls}"><span class="dt"></span><b>${lab}</b><em>${sub}</em></div>`;
+  const s0=c.ph===0?'on':'ok',s1=c.ph===1?'on':c.ph===2?'ok':'',tp=c.ph===2?(c.k>=0?'on up':''):r&&r.net>0?'ok':'',sl=c.ph===2?(c.k<0?'on dn':''):r&&r.net<=0?'bad':'';
+  const bar=c.ph===2?`<div class="bar two"><i class="${c.k>=0?'g':'r'}" style="${c.k>=0?'left:50%':'right:50%'};width:${Math.abs(c.k)*50}%"></i><span class="mid"></span></div>`
+    :`<div class="bar"><i class="w${c.ph===1?' go':''}" style="left:0;width:${c.k*100}%"></i></div>`;
+  return `<div class="stp">${st(s0,'Tunggu','sinyal')}${st(s1,'Open','entry')}${st(tp,'Take profit','+'+P.tpk+' ATR')}${st(sl,'Stop loss','−'+P.slk+' ATR')}</div>${bar}
+    <div class="msg"><span>${c.msg}</span><span class="mut num" data-cd></span></div>
+    <div class="msg mut"><span>${c.sub}</span>${r?`<span class="${r.net>0?'up':'dn'}">${r.type==='T'?'TIME':r.type} ${pc(r.net)} · ${c.ago} bar lalu</span>`:''}</div>`;
+}
+function updCy(){ // perbarui di tempat supaya lebar bar beranimasi
+  const h=cyHTML();document.querySelectorAll('[data-cy]').forEach(el=>{
+    const t=document.createElement('div');t.innerHTML=h;const nb=t.querySelector('.bar'),ob=el.querySelector('.bar');
+    if(ob&&nb&&ob.className===nb.className&&ob.firstChild.className===nb.firstChild.className){ob.firstChild.style.cssText=nb.firstChild.style.cssText;nb.replaceWith(ob)}
+    el.replaceChildren(...t.childNodes)});cdTick();
+}
+function cdTick(){
+  if(!D.length)return;const s=Math.max(0,Math.floor((D[D.length-1].t+TFMS[S.tf]-Date.now())/1000)),h=Math.floor(s/3600),z=n=>String(n).padStart(2,'0');
+  const t='close '+(h?`${h}:${z(Math.floor(s%3600/60))}:${z(s%60)}`:`${z(Math.floor(s/60))}:${z(s%60)}`);document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=t);
+}
+setInterval(cdTick,1000);
 function posHTML(){
-  const o=BT.open,l=D[D.length-1],lev=P.lev;
+  const o=BT.open,n=D.length,l=D[n-1],lev=P.lev;
   if(!o){
-    const s=ENTRIES[P.entry].f(X,D.length-2),g=P.dir==='L'&&s<0?0:s;
-    return `<div class="hd">Posisi<span>${S.tf.toUpperCase()}</span></div>
-      <div style="display:flex;align-items:center;justify-content:space-between"><span class="pill n">FLAT</span><span class="mut">Sinyal bar terakhir ${sigTxt(g)}</span></div>
-      <div class="kv"><div><i>ATR 14</i><span class="num">${fp(X.atr[D.length-2])}</span></div><div><i>Target / Stop</i><span class="num">${P.tpk} / ${P.slk} ATR</span></div></div>
-      <p class="flat">Menunggu sinyal ${ENTRIES[P.entry].n.toLowerCase()}.</p>`;
+    const s=ENTRIES[P.entry].f(X,n-2),g=P.dir==='L'&&s<0?0:s,a=X.atr[n-2],mg=P.mg/100,fe=P.fee/100*2*mg*lev;
+    let h=`<div class="hd">Posisi<span>${S.tf.toUpperCase()} · ${PNAME[S.preset]}</span></div>
+      ${dl('Status',`<span class="pill n">FLAT</span> &nbsp;sinyal ${sigTxt(g)}`)}`;
+    if(PL){const tP=PL.dir*(PL.tp-PL.px)/PL.px,sP=PL.dir*(PL.sl-PL.px)/PL.px;
+      h+=dl('Rencana',`<b class="${PL.dir>0?'up':'dn'}">${PL.dir>0?'LONG':'SHORT'}</b> · ${lev}x · margin ${P.mg}%`)+dl(PL.now?'Entry':'Entry jika close',fp(PL.px))
+        +dl(`Target <em>+${P.tpk}×ATR14</em>`,`<span class="up">${fp(PL.tp)}</span> · ${pc(tP*mg*lev-fe)}`)+dl(`Stop <em>−${P.slk}×ATR14</em>`,`<span class="dn">${fp(PL.sl)}</span> · ${pc(sP*mg*lev-fe)}`)}
+    h+=dl('ATR',`${fp(a)} (${(a/D[n-2].c*100).toFixed(2)}%)`)+dl('Fee bolak-balik',`<span class="warn">−${(fe*100).toFixed(2)}%</span> <em>${lev}x × ${P.fee}% × 2</em>`);
+    return h+`<div class="cy" data-cy>${cyHTML()}</div>`;
   }
   const s=o.dir,mg=o.mg,fe=P.fee/100*2*mg*lev,tpP=s*(o.tp-o.entry)/o.entry,slP=s*(o.sl-o.entry)/o.entry;
   const fl=s*(l.c-o.entry)/o.entry*mg*lev-fe,lo=Math.min(o.sl,o.tp),hi=Math.max(o.sl,o.tp),ps=v=>Math.min(100,Math.max(0,(v-lo)/(hi-lo)*100));
-  return `<div class="hd">Posisi<span>${D.length-1-o.si} bar</span></div>
-    <div style="display:flex;align-items:center;gap:8px"><span class="pill ${s>0?'l':'s'}">${s>0?'LONG':'SHORT'}</span><span class="mut">${lev}x · margin ${Math.round(mg*100)}%${o.lad?' (tangga)':''}</span></div>
-    <div class="kv">
-      <div><i>Entry</i><span class="num">${fp(o.entry)}</span></div><div><i>Harga</i><span class="num" id="lp">${fp(l.c)}</span></div>
-      <div><i>Target</i><span class="num up">${fp(o.tp)}</span> <i style="display:inline">${pc(tpP*mg*lev-fe)}</i></div>
-      <div><i>Stop</i><span class="num dn">${fp(o.sl)}</span> <i style="display:inline">${pc(slP*mg*lev-fe)}</i></div>
-    </div>
+  return `<div class="hd">Posisi<span>${n-1-o.si} bar</span></div>
+    ${dl('Arah',`<b class="${s>0?'up':'dn'}">${s>0?'LONG':'SHORT'}</b> · ${lev}x · margin ${Math.round(mg*100)}%${o.lad?' (tangga)':''}`)}
+    ${dl('Entry',fp(o.entry))}
+    ${dl(`Target <em>${s>0?'+':'−'}${P.tpk}×ATR14</em>`,`<span class="up">${fp(o.tp)}</span> · ${pc(tpP)} harga · ${pc(tpP*mg*lev)} ekuitas`)}
+    ${dl(`Stop <em>${s>0?'−':'+'}${P.slk}×ATR14</em>`,`<span class="dn">${fp(o.sl)}</span> · ${pc(slP)} harga · ${pc(slP*mg*lev)} ekuitas`)}
+    ${dl('ATR',`${fp(o.atr)} (${(o.atr/o.entry*100).toFixed(2)}%)`)}
+    ${dl('Fee bolak-balik',`<span class="warn">−${(fe*100).toFixed(2)}% ekuitas</span> <em>${lev}x × ${P.fee}% × 2</em>`)}
+    ${dl('Bersih setelah fee',`<span class="up">TP ${pc(tpP*mg*lev-fe)}</span> / <span class="dn">SL ${pc(slP*mg*lev-fe)}</span>`)}
+    ${dl('Mengambang',`<span id="fl" class="${fl>=0?'up':'dn'}">${pc(fl)} · ${fd(o.eq0*(1+fl))}</span>`)}
     <div class="rail"><span class="t" style="left:${ps(o.entry)}%"></span><span class="k" id="kn" style="left:${ps(l.c)}%"></span></div>
-    <div class="rl num"><span>${fp(lo)}</span><span>${fp(hi)}</span></div>
-    <div class="pl"><span class="mut">Mengambang</span><span class="v num ${fl>=0?'up':'dn'}" id="fl">${pc(fl)} · ${fd(o.eq0*(1+fl))}</span></div>`;
+    <div class="rl3 num"><span>${fp(lo)}</span><span>entry</span><span>${fp(hi)}</span></div>
+    <div class="cy" data-cy>${cyHTML()}</div>`;
 }
+const sqB=(t,k)=>`<b class="${t.net>0?'':'x'}${t.type==='T'?' t':''}" data-k="${k}" title="${t.type==='T'?'TIME':t.type} ${pc(t.net)} · ${dt(D[t.ei].t)}"></b>`;
 function eqHTML(){
-  const B=BT,mg=P.mg/100,lev=P.lev,fe=P.fee/100*2*mg*lev,at=X.atr[D.length-2]/D[D.length-2].c;
-  const be=(P.slk*at*mg*lev+fe)/((P.tpk+P.slk)*at*mg*lev);
-  const sq=B.T.slice(-60).reverse().map(t=>`<b class="${t.net>0?'':'x'}"></b>`).join('');
+  const B=BT,mg=P.mg/100,lev=P.lev,fe=P.fee/100*2*mg*lev,at=B.T.length?B.T.reduce((s,t)=>s+t.atr/t.entry,0)/B.T.length:X.atr[D.length-2]/D[D.length-2].c; // ATR% rata-rata saat entry
+  const be=(P.slk*at*mg*lev+fe)/((P.tpk+P.slk)*at*mg*lev),be0=P.slk/(P.tpk+P.slk),K=Math.max(0,B.T.length-60);
+  const w=B.T.filter(t=>t.net>0).length;
   return `<div class="hd">Ekuitas<span>${P.per?P.per+' hari':'semua data'}</span></div>
     <div class="eqrow"><span class="eqv num" data-eq>${fd(B.eq)}</span><span class="num ${B.ret>=0?'up':'dn'}">${pc(B.ret,1)}</span></div>
+    <div class="mut" style="font-size:11px">modal ${fd(P.cap)} · ${pc(B.ret,1)} · ${B.T.length} trade</div>
     <canvas id="eqc" data-c></canvas>
     <div class="st">
       <div><i>Trade</i><span class="num">${B.T.length}</span></div>
       <div><i>Win rate</i><span class="num ${B.T.length?(B.wr>=be?'up':'dn'):''}">${(B.wr*100).toFixed(0)}%</span></div>
-      <div><i>Impas</i><span class="num">${(be*100).toFixed(0)}%</span></div>
+      <div><i>Impas</i><span class="num">${be<1?(be*100).toFixed(0)+'%':'—'}</span></div>
       <div><i>Max DD</i><span class="num ${B.mdd>.25?'dn':''}">${(B.mdd*100).toFixed(1)}%</span></div>
     </div>
-    <div class="sq">${B.open?'<b class="o"></b>':''}${sq}</div>`;
+    <div class="sqh"><span>Trade · lama → baru${K?` (60 terakhir)`:''}</span><span><span class="up">${w} hijau</span> · <span class="dn">${B.T.length-w} merah</span></span></div>
+    <div class="sq" data-sq>${B.T.slice(K).map((t,k)=>sqB(t,K+k).replace('<b ',`<b style="animation-delay:${k*14}ms" `)).join('')}${B.open?'<b class="o" title="Berjalan"></b>':''}</div>
+    <div class="be">Impas untuk rasio ini: ${(be0*100).toFixed(1)}% menang sebelum fee, ${be<1?(be*100).toFixed(1)+'%':'tidak mungkin'} setelah fee (ATR rata-rata ${(at*100).toFixed(2)}%).</div>`;
 }
 function curve(cv){
   if(!cv||!cv.clientWidth)return;const W=cv.clientWidth,H=cv.clientHeight,dpr=devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;
@@ -509,27 +668,76 @@ function curve(cv){
   x.setLineDash([2,3]);x.strokeStyle='rgba(139,149,181,.35)';x.lineWidth=1;x.beginPath();x.moveTo(0,Y(P.cap));x.lineTo(W,Y(P.cap));x.stroke();x.setLineDash([]);
 }
 function histHTML(){
-  const L=BT.T.slice().reverse();let h='';
-  if(BT.open){const o=BT.open;h+=`<div class="tr"><span class="b op">OPEN</span><div class="m num">${fp(o.entry)} → …<i>${dt(D[o.ei].t)} · ${D.length-1-o.si} bar</i></div><div class="r mut">berjalan</div></div>`}
-  h+=L.slice(0,300).map(t=>`<div class="tr"><span class="b ${t.net>0?'tp':'sl'}">${t.type==='T'?'TIME':t.type}</span>
-    <div class="m num">${fp(t.entry)} → ${fp(t.exit)}<i>${dt(D[t.ei].t)} · ${t.bars} bar${t.dir<0?' · short':''}${t.lad?' · tangga':''}</i></div>
-    <div class="r num ${t.net>0?'up':'dn'}">${pc(t.net)}<i>${fd(t.eq)}</i></div></div>`).join('');
-  return h||'<p class="empty">Belum ada trade di periode ini.</p>';
+  const T=BT.T,tp=T.filter(t=>t.type==='TP').length,sl=T.filter(t=>t.type==='SL').length,tm=T.length-tp-sl;
+  let h=`<div class="hh"><span>Riwayat TP / SL</span><span><span class="up">${tp} TP</span> · <span class="dn">${sl} SL</span>${tm?` · ${tm} time`:''}</span></div>`;
+  if(T.length)h+=`<div class="grid">${T.map((t,k)=>sqB(t,k).replace('<b ',`<b style="animation-delay:${Math.min(k,150)*8}ms" `)).join('')}${BT.open?'<b class="o"></b>':''}</div>`;
+  if(BT.open){const o=BT.open;h+=`<div class="tr" data-k="open"><span class="b op">OPEN</span><div class="m num">${fp(o.entry)} → …<i>${dt(D[o.ei].t)} · ${D.length-1-o.si} bar · margin ${Math.round(o.mg*100)}%</i></div><div class="r mut">berjalan</div></div>`}
+  h+=T.slice().reverse().slice(0,300).map((t,r)=>{const k=T.length-1-r;return `<div class="tr" data-k="${k}"><span class="b ${t.net>0?'tp':'sl'}">${t.type==='T'?'TIME':t.type}</span>
+    <div class="m num">${fp(t.entry)} → ${fp(t.exit)}<i>${dt(D[t.ei].t)} · ${t.bars} bar${t.dir<0?' · short':''} · margin ${Math.round(t.mg*100)}%${t.lad?' tangga':''} · kotor ${pc(t.gross)} · fee −${(t.fr*100).toFixed(2)}%</i></div>
+    <div class="r num ${t.net>0?'up':'dn'}">${pc(t.net)}<i>${fd(t.eq)}</i></div></div>`}).join('');
+  return T.length||BT.open?h:h+'<p class="empty">Belum ada trade di periode ini.</p>';
+}
+function focusTrade(k){
+  const t=k==='open'?BT.open:BT.T[+k];if(!t)return;HL=t;clearTimeout(hlT);hlT=setTimeout(()=>{HL=null;drawOv()},4000);
+  const i1=k==='open'?D.length-1:t.xi,w=Math.max(60,i1-t.ei+40),r={from:t.ei-w/2,to:i1+w/2};
+  [c1,c2,c3].forEach(c=>{c.timeScale().setVisibleLogicalRange(r);c.priceScale('right').applyOptions({autoScale:true})});drawOv();
 }
 function valHTML(){
-  const n=D.length,cut=Math.floor(201+(n-201)*.6),A=backtest(P,201,n),I=backtest(P,201,cut),O=backtest(P,cut,n),bh=D[n-1].c/D[201].o-1;
+  const n=D.length,s0=w0(n),cut=Math.floor(s0+(n-s0)*.6),A=backtest(P,s0,n),I=backtest(P,s0,cut),O=backtest(P,cut,n),bh=D[n-1].c/D[s0].o-1;
   const r=(k,b)=>`<tr><td>${k}</td><td class="num">${b.T.length}</td><td class="num">${(b.wr*100).toFixed(0)}%</td><td class="num ${b.ret>=0?'up':'dn'}">${pc(b.ret,1)}</td><td class="num">${(b.mdd*100).toFixed(0)}%</td></tr>`;
   const ok=I.ret>0&&O.ret>0&&A.T.length>=30;
-  const d0=new Date(D[201].t).toISOString().slice(0,10);
-  return `<table class="vt"><tr><th>Data</th><th>Trade</th><th>Win</th><th>Hasil</th><th>DD</th></tr>${r('Semua',A)}${r('Awal 60%',I)}${r('Akhir 40%',O)}
+  const d0=new Date(D[s0].t).toISOString().slice(0,10);
+  let h=`<div class="hh"><span>Data di layar</span><span>${n-s0} bar sejak ${d0}</span></div>
+    <table class="vt"><tr><th>Data</th><th>Trade</th><th>Win</th><th>Hasil</th><th>DD</th></tr>${r('Semua',A)}${r('Awal 60%',I)}${r('Akhir 40%',O)}
     <tr><td class="mut">Beli & tahan</td><td></td><td></td><td class="num ${bh>=0?'up':'dn'}">${pc(bh,1)}</td><td></td></tr></table>
-    <div class="vd"><span class="pill ${ok?'l':'s'}">${ok?'LOLOS':'BELUM LOLOS'}</span><span>${n-201} bar sejak ${d0}</span></div>
-    ${S.preset==='optimal'?(z=>`<div class="vd"><span class="pill n">RISET</span><span>BTC ${z[4]} · ${z[0]} trade · WR ${z[1]}% / ${z[2]}% · ETH ${z[3]}%</span></div>`)(RISET[S.tf]):''}`;
+    <div class="vd"><span class="pill ${ok?'l':A.T.length<30?'w':'s'}">${ok?'LOLOS':A.T.length<30?'SAMPEL KECIL':'BELUM LOLOS'}</span><span>${A.T.length<30?'kurang dari 30 trade di data layar':'awal & akhir sama-sama untung'}</span></div>`;
+  const z=(S.preset==='scalp'||S.preset==='swing')&&RISET2[S.tf];
+  if(z)h+=`<div class="hh" style="margin-top:12px"><span>Riset preset ${PNAME[S.preset]} ${S.tf.toUpperCase()}</span><span>BTC ${z[0]}</span></div>
+    <table class="vt"><tr><th>Uji (data panjang)</th><th>Trade</th><th>Win</th></tr>
+    ${[['BTC 60% awal',z[1]],['BTC 40% akhir',z[2]],['ETH (silang)',z[3]],['SOL (silang)',z[4]]].map(([k,v])=>`<tr><td>${k}</td><td class="num">${v[0]}</td><td class="num up">${v[1]}%</td></tr>`).join('')}</table>
+    <p class="foot">Dipilih dari ${S.preset==='scalp'?'54.600':'14.560'} kombinasi. Lolos hanya jika keempat uji untung setelah fee 0,045%/sisi. Win rate tinggi datang dari TP ${P.tpk} ATR vs SL ${P.slk} ATR: satu SL menghapus beberapa TP, jadi keuntungan per trade kecil.</p>`;
+  else if(S.preset==='optimal')h+=(z=>`<div class="vd"><span class="pill n">RISET</span><span>BTC ${z[4]} · ${z[0]} trade · WR ${z[1]}% / ${z[2]}% · ETH ${z[3]}%</span></div>`)(RISET[S.tf]);
+  return h;
+}
+/* ---------- akurasi indikator × time frame ---------- */
+const MROWS=['rsi2_htf3','sc_stoch10','sc_stoch5','sw_rsi2','sw_dn3','trend200','rsi14_dip','rsi2_trend','rsi2_htf5','bb_trend','pull_e20','rsi2_any','bb_any','hist_rise'];
+let MX=null,mxSeq=0;const MXC={};
+async function loadMx(){
+  const my=++mxSeq,sym=S.sym,R={};MX={sym,R,busy:true};renderAcc();
+  for(const [tf] of TFS){
+    let d=null;const key=sym+'|'+tf,c=MXC[key];
+    if(tf===S.tf&&D.length&&S.sym===sym)d=D;else if(c&&Date.now()-c.t<6e5)d=c.d;else{try{d=await loadAll(sym,tf);MXC[key]={t:Date.now(),d}}catch(e){}}
+    if(my!==mxSeq)return;
+    if(d&&d.length>=300){const Z=calc(d),base=presetFor(GRP(tf),tf),n=d.length;R[tf]={};
+      MROWS.forEach(e=>{const b=backtest(Object.assign({},base,{entry:e}),0,n,false,Z);R[tf][e]={n:b.T.length,wr:b.wr,ret:b.ret,mdd:b.mdd}})}
+    renderAcc();await new Promise(z=>setTimeout(z,30));
+  }
+  MX.busy=false;renderAcc();
+}
+function renderAcc(){$('sAcc').innerHTML=accHTML()}
+function accHTML(){
+  const hd=`<div class="hh"><span>Akurasi indikator × TF</span><span>${MX&&MX.busy?'memuat…':S.sym.replace('USDT','')}</span></div>`;
+  if(!MX||MX.sym!==S.sym)return hd+'<p class="empty">Membuka tab ini mengunduh 5 time frame.</p>';
+  let h=`<div class="mx"><span class="mut" style="font-size:10.5px">Win rate · trade</span>${TFS.map(([k,l])=>`<span class="h ${GRP(k)}">${l}</span>`).join('')}`,dly=0;
+  MROWS.forEach(e=>{
+    h+=`<span class="nm" title="${ENTRIES[e].r}">${ENTRIES[e].s||ENTRIES[e].n}</span>`;
+    TFS.forEach(([tf])=>{const r=MX.R[tf]&&MX.R[tf][e];
+      if(!r){h+=`<span class="c z">${MX.busy?'…':'—'}</span>`;return}
+      const cls=r.n<5?'z':r.wr>=.6&&r.ret>0?'g':r.wr>=.6?'a':'r',a=cls==='g'?.2+Math.min(1,(r.wr-.6)/.35)*.6:cls==='r'?.2+Math.min(1,(.6-r.wr)/.3)*.5:0;
+      const on=tf===S.tf&&e===(P.entry==='dewa'?P.base:P.entry)?' on':'';
+      h+=`<button class="c ${cls}${on}" style="--a:${a.toFixed(2)};animation-delay:${(dly++)*10}ms" data-e="${e}" data-tf="${tf}" title="${ENTRIES[e].n} · ${tf.toUpperCase()} · ${r.n} trade · WR ${(r.wr*100).toFixed(0)}% · hasil ${pc(r.ret,1)} · DD ${(r.mdd*100).toFixed(0)}%">${r.n?Math.round(r.wr*100):'—'}<i>${r.n}×</i></button>`})});
+  return hd+h+`</div><div class="lg"><span><b class="g"></b>≥60% & untung</span><span><b class="a"></b>≥60% tapi rugi setelah fee</span><span><b class="r"></b>&lt;60%</span></div>
+    <p class="foot">±5000 bar terakhir per TF dari Binance. TP/SL & arah mengikuti preset Scalping (15m–1H, garis biru) atau Swing (4H–1D, garis ungu) di TF itu. Klik kotak untuk memakai kombinasi tersebut.</p>`;
+}
+function useCell(e,tf){
+  const g=GRP(tf),p=presetFor(g,tf),same=p.entry===e,ch=tf!==S.tf;
+  S.preset=same?g:'custom';P=same?p:Object.assign(p,{entry:e});S.tf=tf;presetOpts();markTf();save();
+  if(ch)load();else{recompute(true,true);fit()}
 }
 function ruleHTML(){
   const p=P,E=ENTRIES[p.entry];
   const row=(k,v)=>`<i>${k}</i><span>${v}</span>`;
-  return `<div class="rules">${row('Preset',(S.preset==='optimal'?'Optimal':S.preset==='dewa'?'Mata Dewa':S.preset==='custom'?'Kustom':'Default')+' · '+S.tf.toUpperCase())}${row('Entry',E.r)}${row('Arah',p.dir==='L'?'Long saja':'Long + short')}
+  return `<div class="rules">${row('Preset',PNAME[S.preset]+' · '+S.tf.toUpperCase())}${row('Entry',E.r)}${row('Arah',p.dir==='L'?'Long saja':'Long + short')}
     ${row('Eksekusi','Sinyal saat bar close, entry di open bar berikutnya')}${row('Target',`${p.tpk} × ATR14`)}${row('Stop',`${p.slk} × ATR14`)}
     ${row('Batas waktu',p.mb?`${p.mb} bar, lalu tutup di close`:'Tidak ada')}${row('Ukuran',`Margin ${p.mg}% × ${p.lev}x · fee ${p.fee}% per sisi`)}
     ${row('Impas',`Win rate ${(p.slk/(p.tpk+p.slk)*100).toFixed(1)}% sebelum fee`)}${p.entry==='dewa'?row('Mata Dewa',`Dasar: ${!p.base||p.base==='all'?'semua bar':ENTRIES[p.base].n} · ambang ${((p.thr||.75)*100).toFixed(0)}%`):''}${row('Repaint','Tidak · sinyal & proyeksi dikunci saat bar close')}${row('Tangga',p.lad?`${p.ladm}% setelah ${p.ladn} SL beruntun`:'Nonaktif')}</div>`;
@@ -565,8 +773,11 @@ function renderPanel(anim){
   [[$('cPos'),ph],[$('mPos'),ph],[$('cEq'),eh],[$('mEq'),eh]].forEach(([el,h])=>{el.innerHTML=h;if(anim){el.classList.remove('fadein');void el.offsetWidth;el.classList.add('fadein')}});
   document.querySelectorAll('[data-c]').forEach(curve);
   document.querySelectorAll('[data-eq]').forEach(el=>tween(el,BT.eq));
-  $('sHist').innerHTML=histHTML();$('sVal').innerHTML=valHTML();$('sRule').innerHTML=ruleHTML();
+  $('sHist').innerHTML=histHTML();$('sVal').innerHTML=valHTML();$('sRule').innerHTML=ruleHTML();if(MX)renderAcc();
+  document.querySelectorAll('[data-cy] .bar i').forEach(i=>{const w=i.style.width;i.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>i.style.width=w))});
+  plKey=PL?[PL.px.toFixed(6),PL.now,PL.dir].join():'';cdTick();
 }
+let plKey='';
 function head(){
   const l=D[D.length-1],ref=(D.find(b=>b.t>=l.t-864e5)||D[0]).o,ch=l.c/ref-1;
   $('px').textContent=fp(l.c);$('pc').textContent=pc(ch);$('pc').className='c num '+(ch>=0?'up':'dn');
@@ -575,7 +786,7 @@ function head(){
 }
 /* ---------- Mata Dewa: pola serupa (k-NN) walk-forward ----------
    Fitur bar i hanya dari data ≤ i; tetangga hanya bar yang hasilnya sudah selesai sebelum i → tanpa intip masa depan. */
-const HZ=48,PH=24,KN=40;
+const HZ=48,PH=24,KN=40,NW=4400; // NW: jendela tetangga & evaluasi, menjaga waktu hitung pada data 10.000 bar
 function dewaFeat(){
   const n=D.length,c=X.c,a=X.atr,F=new Float64Array(n*11),cum=new Float64Array(n);
   for(let i=1;i<n;i++)cum[i]=cum[i-1]+Math.log(c[i]/c[i-1]);
@@ -591,9 +802,9 @@ function dewaLabels(tpk,slk,last){
     if(isNaN(lab[i])&&i+HZ<=last)lab[i]=X.c[i+HZ]>e?1:0}
   return lab;
 }
-function knn(F,i,m,bi,bd){ // K tetangga terdekat untuk bar i di antara k ∈ [200, m]
+function knn(F,i,m,bi,bd){ // K tetangga terdekat untuk bar i di antara k ∈ [max(200, m−4400), m]
   let cnt=0,worst=0;const o=i*11;
-  for(let k=200;k<=m;k++){const q=k*11;let d=0;for(let f=0;f<11;f++){const t=F[q+f]-F[o+f];d+=t*t}
+  for(let k=Math.max(200,m-NW);k<=m;k++){const q=k*11;let d=0;for(let f=0;f<11;f++){const t=F[q+f]-F[o+f];d+=t*t}
     if(cnt<KN){bd[cnt]=d;bi[cnt]=k;cnt++;if(cnt===KN){worst=0;for(let z=1;z<KN;z++)if(bd[z]>bd[worst])worst=z}}
     else if(d<bd[worst]){bd[worst]=d;bi[worst]=k;worst=0;for(let z=1;z<KN;z++)if(bd[z]>bd[worst])worst=z}}
   return cnt;
@@ -602,7 +813,7 @@ async function dewaRun(){
   const n=D.length,L=n-2,key=[S.sym,S.tf,D[L].t,P.tpk,P.slk].join('|');if(key===dwKey&&DW)return false;
   const my=++dwSeq,F=dewaFeat(),lab=dewaLabels(P.tpk,P.slk,L),PR=new Float64Array(n).fill(NaN),FM=new Float64Array(n).fill(NaN);
   const bi=new Int32Array(KN),bd=new Float64Array(KN);let t0=performance.now();
-  for(let i=600;i<=L;i++){
+  for(let i=Math.max(600,L-NW);i<=L;i++){
     const m=i-HZ-1;if(m<400)continue;
     const cnt=knn(F,i,m,bi,bd);let s=0,r=[];for(let z=0;z<cnt;z++){s+=lab[bi[z]];r.push(X.c[bi[z]+PH]/X.c[bi[z]])}
     PR[i]=s/cnt;r.sort((a,b)=>a-b);FM[i]=r[r.length>>1];
@@ -621,7 +832,7 @@ async function dewaRun(){
 }
 /* evaluasi sinyal di bar berjalan bila close = cH (tanpa hitung ulang seluruh data) */
 function hypo(cH,fn){
-  const i=D.length-1,b=D[i],K=['c','h','l','e20','e50','e200','e800','e12','e26','m','s','hi','rsi','rsi2','ag14','al14','ag2','al2','atr','bbl','bbu'],sv={};
+  const i=D.length-1,b=D[i],K=['c','h','l','e20','e50','e200','e800','e12','e26','m','s','hi','rsi','rsi2','ag14','al14','ag2','al2','atr','bbl','bbu','stk'],sv={};
   K.forEach(k=>sv[k]=X[k][i]);
   const E=(k,n)=>X[k][i]=X[k][i-1]+2/(n+1)*(cH-X[k][i-1]),ch=cH-X.c[i-1];
   X.c[i]=cH;X.h[i]=Math.max(b.h,cH);X.l[i]=Math.min(b.l,cH);[['e20',20],['e50',50],['e200',200],['e800',800],['e12',12],['e26',26]].forEach(([k,n])=>E(k,n));
@@ -629,6 +840,7 @@ function hypo(cH,fn){
   const R=(n,g,l)=>{X[g][i]=X[g][i-1]+(Math.max(ch,0)-X[g][i-1])/n;X[l][i]=X[l][i-1]+(Math.max(-ch,0)-X[l][i-1])/n;return 100-100/(1+X[g][i]/(X[l][i]||1e-12))};
   X.rsi[i]=R(14,'ag14','al14');X.rsi2[i]=R(2,'ag2','al2');
   const tr=Math.max(X.h[i]-X.l[i],Math.abs(X.h[i]-X.c[i-1]),Math.abs(X.l[i]-X.c[i-1]));X.atr[i]=X.atr[i-1]+(tr-X.atr[i-1])/14;
+  {let H=-Infinity,L=Infinity;for(let j=i-13;j<=i;j++){H=Math.max(H,X.h[j]);L=Math.min(L,X.l[j])}X.stk[i]=H>L?(cH-L)/(H-L+1e-12)*100:50}
   let sm=0,qq=0;for(let j=i-19;j<=i;j++)sm+=X.c[j];const mu=sm/20;for(let j=i-19;j<=i;j++)qq+=(X.c[j]-mu)**2;const sd=Math.sqrt(qq/20);X.bbl[i]=mu-2*sd;X.bbu[i]=mu+2*sd;
   const r=fn(X,i);K.forEach(k=>X[k][i]=sv[k]);return r;
 }
@@ -640,32 +852,40 @@ function plan(){
   const s=P.dir==='L'?1:(hypo(px,(Y,k)=>base(Y,k))>0?1:-1);
   return {now,px,dir:s,tp:px+s*P.tpk*a,sl:px-s*P.slk*a};
 }
-function start(){if(!P.per)return 201;const t0=D[D.length-1].t-P.per*864e5;const i=D.findIndex(b=>b.t>=t0);return Math.max(i<0?0:i,201)}
+function start(){const s0=w0(D.length);if(!P.per)return s0;const t0=D[D.length-1].t-P.per*864e5;const i=D.findIndex(b=>b.t>=t0);return Math.max(i<0?0:i,s0)}
 function recompute(keep,anim){
   X=calc(D);PL=plan();BT=backtest(P,start(),D.length,true);fill(keep);head();renderPanel(anim);drawOv();
-  dewaRun().then(ch=>{if(!ch)return;if(P.entry==='dewa'){BT=backtest(P,start(),D.length,true);markers();posLines();renderPanel(false)}else renderDewa();drawOv()});
+  dewaRun().then(ch=>{if(!ch)return;if(P.entry==='dewa'){PL=plan();BT=backtest(P,start(),D.length,true);markers();posLines();renderPanel(false)}else renderDewa();drawOv()});
 }
 let PL=null;
 function tick(){
   const l=D[D.length-1],i=D.length-1;X=calc(D);
   cs.update({time:tz(l.t),open:l.o,high:l.h,low:l.l,close:l.c});
   const v=X.hi[i],k=v>X.hi[i-1];mh.update({time:tz(l.t),value:v,color:v>=0?(k?UP:'rgba(46,196,166,.4)'):(k?'rgba(239,97,137,.4)':DN)});
-  mm.update({time:tz(l.t),value:X.m[i]});msg.update({time:tz(l.t),value:X.s[i]});rs.update({time:tz(l.t),value:X.rsi[i]});
+  mm.update({time:tz(l.t),value:X.m[i]});msg.update({time:tz(l.t),value:X.s[i]});rs.update({time:tz(l.t),value:X[osc().k][i]});
   const o=BT.open;if(o&&(o.dir>0?(l.l<=o.sl||l.h>=o.tp):(l.h>=o.sl||l.l<=o.tp))){recompute(true,true);return}
-  head();PL=plan();renderDewa();
+  head();PL=plan();renderDewa();posLines();
+  const pk=PL?[PL.px.toFixed(6),PL.now,PL.dir].join():'';
+  if(!o&&pk!==plKey){const h=posHTML();[$('cPos'),$('mPos')].forEach(el=>el.innerHTML=h);plKey=pk;cdTick()}else updCy();
   if(o){const mg=o.mg,fl=o.dir*(l.c-o.entry)/o.entry*mg*P.lev-P.fee/100*2*mg*P.lev,lo=Math.min(o.sl,o.tp),hi=Math.max(o.sl,o.tp);
-    document.querySelectorAll('#fl').forEach(e=>{e.textContent=pc(fl)+' · '+fd(o.eq0*(1+fl));e.className='v num '+(fl>=0?'up':'dn')});
+    document.querySelectorAll('#fl').forEach(e=>{e.textContent=pc(fl)+' · '+fd(o.eq0*(1+fl));e.className=fl>=0?'up':'dn'});
     document.querySelectorAll('#lp').forEach(e=>e.textContent=fp(l.c));
     document.querySelectorAll('#kn').forEach(e=>e.style.left=Math.min(100,Math.max(0,(l.c-lo)/(hi-lo)*100))+'%');
     document.querySelectorAll('[data-c]').forEach(curve)}
   drawOv();
 }
 function toEnd(){const n=D.length,w=$('c1').clientWidth,show=Math.max(40,Math.min(160,Math.round(w/8))),ex=S.eye?PH+6:5,r={from:n-show,to:n+ex};[c1,c2,c3].forEach(c=>c.timeScale().setVisibleLogicalRange(r))}
+/* Auto: kembali ke bar terakhir di kanan + skala harga otomatis 100% di semua panel */
+function fit(){
+  [c1,c2,c3].forEach(c=>{c.priceScale('right').applyOptions({autoScale:true,scaleMargins:c===c1?{top:.1,bottom:.08}:{top:.12,bottom:.08}});c.timeScale().applyOptions({rightOffset:S.eye?PH+6:6})});
+  toEnd();const b=$('fitBtn');b.classList.remove('spin');void b.offsetWidth;b.classList.add('spin');drawOv();
+}
 async function load(){
   const my=++seq;document.body.classList.add('busy');clearInterval(pollT);$('err').style.display='none';
   try{
     const d=await loadAll(S.sym,S.tf);if(my!==seq)return;if(d.length<300)throw new Error('data kurang');
-    D=d;lastEq=null;DW=null;dwKey='';recompute(false,true);toEnd();requestAnimationFrame(()=>requestAnimationFrame(toEnd));
+    D=d;lastEq=null;DW=null;dwKey='';HL=null;recompute(false,true);fit();requestAnimationFrame(()=>requestAnimationFrame(toEnd));
+    if(S.tab==='acc'&&(!MX||MX.sym!==S.sym))loadMx();
     $('dot').classList.remove('off');pollT=setInterval(poll,5000);
   }catch(e){$('err').textContent='Gagal memuat data · mencoba lagi';$('err').style.display='block';$('dot').classList.add('off');setTimeout(()=>my===seq&&load(),6000)}
   finally{if(my===seq)document.body.classList.remove('busy')}
@@ -679,24 +899,32 @@ async function poll(){
 
 /* kontrol */
 function moveInd(box,btn){const ind=box.querySelector('.ind');if(!btn||!ind)return;ind.style.width=btn.offsetWidth+'px';ind.style.transform=`translateX(${btn.offsetLeft-(box.classList.contains('seg')?0:0)}px)`}
-$('tfs').insertAdjacentHTML('beforeend',TFS.map(([k,l])=>`<button data-tf="${k}">${l}</button>`).join(''));
+$('tfs').insertAdjacentHTML('beforeend',TFS.map(([k,l])=>(k==='4h'?'<span class="gap"></span>':'')+`<button data-tf="${k}" title="${GRP(k)==='scalp'?'Scalping':'Swing'} · klik lagi untuk Auto">${l}</button>`).join(''));
 $('sym').innerHTML=SYMS.map(s=>`<option value="${s}" ${s===S.sym?'selected':''}>${s.replace('USDT','')}</option>`).join('');
-function presetOpts(){$('preset').innerHTML=`<option value="default">Default</option><option value="optimal">Optimal</option><option value="dewa">Mata Dewa</option>${S.preset==='custom'?'<option value="custom">Kustom</option>':''}`;$('preset').value=S.preset}
+function presetOpts(){const m=innerWidth<=480;$('preset').innerHTML=`<option value="scalp">${m?'Scalp':'Scalping · 15m–1H'}</option><option value="swing">${m?'Swing':'Swing · 4H–1D'}</option><option value="dewa">${m?'Dewa':'Mata Dewa'}</option><option value="optimal">Optimal</option><option value="default">Default</option>${S.preset==='custom'?'<option value="custom">Kustom</option>':''}`;$('preset').value=S.preset}
 $('f_entry').innerHTML=Object.entries(ENTRIES).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join('');
 function markTf(){const b=[...$('tfs').querySelectorAll('button')];b.forEach(x=>x.classList.toggle('on',x.dataset.tf===S.tf));moveInd($('tfs'),b.find(x=>x.dataset.tf===S.tf))}
 function setTab(t){
   const mob=innerWidth<=820;if(!mob&&(t==='pos'||t==='eq'||t==='dewa'))t='hist';S.tab=t;
   document.querySelectorAll('#tb button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
   document.querySelectorAll('.sec').forEach(s=>s.classList.toggle('on',s.dataset.s===t));
-  moveInd($('tb'),$('tb').querySelector(`[data-t="${t}"]`));if(t==='eq')document.querySelectorAll('[data-c]').forEach(curve);save();
+  moveInd($('tb'),$('tb').querySelector(`[data-t="${t}"]`));if(t==='eq')document.querySelectorAll('[data-c]').forEach(curve);
+  if(t==='acc'){if(!MX||MX.sym!==S.sym){if(D.length)loadMx();else renderAcc()}else renderAcc()}save();
 }
-const save=()=>{LS.set('s2',S);if(S.preset==='custom')LS.set('custom',P)};
-$('tfs').onclick=e=>{const tf=e.target.dataset.tf;if(!tf||tf===S.tf)return;S.tf=tf;if(S.preset==='optimal'||S.preset==='dewa')P=presetFor(S.preset,tf);presetOpts();markTf();save();load()};
-$('sym').onchange=e=>{S.sym=e.target.value;save();load()};
-$('preset').onchange=e=>{S.preset=e.target.value;if(S.preset!=='custom')P=presetFor(S.preset,S.tf);presetOpts();save();
+const save=()=>{LS.set('s3',S);if(S.preset==='custom')LS.set('custom',P)};
+$('tfs').onclick=e=>{const tf=e.target.dataset.tf;if(!tf)return;if(tf===S.tf){fit();return}
+  S.tf=tf;if(S.preset==='scalp'||S.preset==='swing')S.preset=GRP(tf);if(S.preset!=='custom')P=presetFor(S.preset,tf);presetOpts();markTf();save();load()};
+$('sym').onchange=e=>{S.sym=e.target.value;MX=null;save();load()};
+$('preset').onchange=e=>{S.preset=e.target.value;let tfc=false;
+  if((S.preset==='scalp'||S.preset==='swing')&&GRP(S.tf)!==S.preset){S.tf=S.preset==='scalp'?'30m':'4h';tfc=true;markTf()}
+  if(S.preset!=='custom')P=presetFor(S.preset,S.tf);presetOpts();save();
+  if(tfc){load();return}
   document.body.classList.add('busy');setTimeout(()=>{if(D.length)recompute(true,true);document.body.classList.remove('busy')},180)};
 $('tb').onclick=e=>{if(e.target.dataset.t)setTab(e.target.dataset.t)};
-$('end').onclick=toEnd;
+$('end').onclick=fit;$('fitBtn').onclick=fit;$('c1').addEventListener('dblclick',fit);
+const onTrade=e=>{const b=e.target.closest('[data-k]');if(b){focusTrade(b.dataset.k)}};
+$('sHist').onclick=onTrade;['cEq','mEq'].forEach(id=>$(id).onclick=onTrade);
+$('sAcc').onclick=e=>{const b=e.target.closest('[data-e]');if(b)useCell(b.dataset.e,b.dataset.tf)};
 function eye(){$('eyeBtn').classList.toggle('on',!!S.eye);[c1,c2,c3].forEach(c=>c.timeScale().applyOptions({rightOffset:S.eye?PH+6:6}));drawOv()}
 $('eyeBtn').onclick=()=>{S.eye=!S.eye;save();eye();toEnd()};
 const F=['entry','dir','tpk','slk','mb','mg','lev','fee','cap','per','ladn','ladm'];
@@ -712,12 +940,12 @@ $('f_ok').onclick=()=>{
   P=Object.assign({},P,n);if(!same)S.preset='custom';presetOpts();save();$('dr').classList.remove('on');recompute(true,true);
 };
 addEventListener('keydown',e=>{if(e.key==='Escape')$('dr').classList.remove('on')});
-addEventListener('resize',()=>{markTf();setTab(S.tab)});
+addEventListener('resize',()=>{markTf();setTab(S.tab);presetOpts()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&D.length)poll()});
 presetOpts();markTf();setTab(S.tab);eye();
 document.fonts&&document.fonts.ready.then(()=>{markTf();setTab(S.tab)});
 load();
-window.BTCV1={get D(){return D},get BT(){return BT},get P(){return P},get DW(){return DW},get PL(){return PL},backtest,OPTIMAL,DEWA,cs,tz};
+window.BTCV1={get D(){return D},get BT(){return BT},get P(){return P},get DW(){return DW},get PL(){return PL},get MX(){return MX},get S(){return S},backtest,calc,OPTIMAL,DEWA,SCALP,SWING,cs,tz,fit,focusTrade,render:()=>{posLines();renderPanel(true)}};
 })();
 </script>
 </body>
