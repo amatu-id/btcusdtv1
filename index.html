@@ -143,6 +143,29 @@ body.busy .chart{opacity:.45;filter:saturate(.6)}
 @keyframes flow{to{background-position:-200% 0}}
 .cy .msg{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;margin-top:6px}
 .cy .msg.mut{font-size:11px;margin-top:2px}
+/* monitor multi TF */
+.mtf{flex:none;display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--line);background:var(--s1);overflow-x:auto;scrollbar-width:none;white-space:nowrap;min-height:37px}
+.mtf::-webkit-scrollbar{display:none}
+.chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 8px;border-radius:7px;border:1px solid var(--line);background:var(--s2);font-size:11.5px;font-weight:600;color:var(--mut);flex:none;transition:border-color .25s,background .25s}
+.chip b{color:var(--ink)}.chip:hover{border-color:var(--line2)}
+.chip.l{background:linear-gradient(90deg,rgba(46,196,166,.13),rgba(46,196,166,.03))}.chip.s{background:linear-gradient(90deg,rgba(239,97,137,.13),rgba(239,97,137,.03))}
+.chip .ar{font-size:9px}.ar.l,.chip.l .bl{color:var(--up)}.ar.s,.chip.s .bl{color:var(--dn)}.ar.n{color:var(--dim)}
+.chip.on{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+.chip .cs{font-size:10px;font-weight:700;padding:2px 5px;border-radius:4px;color:var(--mut);background:var(--s3)}
+.chip .cs.open{background:var(--warn);color:#1a1400}.chip .cs.ready{background:rgba(242,201,76,.2);color:var(--warn);animation:blink 1.2s ease-in-out infinite}
+.chip .cs.near{box-shadow:inset 0 0 0 1px rgba(242,201,76,.55);background:none;color:var(--warn)}
+.mtf .sum{flex:1;min-width:160px;text-align:right;font-size:11.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;padding-left:6px}
+.mtf .sum b{color:var(--ink);font-weight:600}
+.mm{display:inline-flex;gap:2px;background:var(--s1);border-radius:6px;padding:2px}
+.mm button{border:0;background:none;font-size:10.5px;font-weight:600;color:var(--mut);padding:3px 7px;border-radius:4px}.mm button.on{background:var(--s3);color:var(--ink)}
+.msum{display:grid;gap:5px;padding:9px 10px;border-radius:8px;background:var(--s1);border:1px solid var(--line);font-size:12px;margin-bottom:6px}
+.msum div{display:grid;grid-template-columns:44px 1fr;gap:6px}.msum i{font-style:normal;color:var(--mut)}
+.mr{display:grid;grid-template-columns:38px 1fr;gap:8px;padding:8px 2px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .2s;border-radius:6px}
+.mr:hover{background:rgba(91,140,255,.05)}.mr.on{background:rgba(91,140,255,.08)}
+.tfb{font-size:13px;display:flex;flex-direction:column}.tfb em{font-style:normal;font-size:9.5px;color:var(--dim);font-weight:500}
+.mc{min-width:0;display:grid;gap:4px}.ml{display:flex;align-items:center;gap:7px;font-size:11px}
+.dots{display:inline-flex;gap:2px}.dots i{width:7px;height:7px;border-radius:2px;background:var(--dn)}.dots i.u{background:var(--up)}
+.ms{font-size:12px;line-height:1.35}.mi{display:flex;justify-content:space-between;gap:6px;font-size:10.5px;color:var(--mut)}
 /* matriks akurasi */
 .mx{display:grid;grid-template-columns:minmax(0,1fr) repeat(5,40px);gap:3px;align-items:center;font-size:11px}
 .mx .h{color:var(--mut);text-align:center;font-weight:600;font-size:10.5px;padding-bottom:2px;border-bottom:2px solid var(--acc)}
@@ -264,6 +287,7 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
 
 <div class="app">
   <section class="chart">
+    <div class="mtf" id="mtf"></div>
     <div class="pn a"><div class="lc" id="c1"></div><canvas id="ov"></canvas><div class="lab" id="lab1"></div><div class="tag" id="tag"></div>
       <button class="end" id="end" aria-label="Auto" title="Auto: kembali ke bar terakhir & skala harga 100%"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
     <div class="pn b"><div class="lc" id="c2"></div><div class="lab">MACD 12 26 9</div></div>
@@ -278,12 +302,13 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
     <div class="card tabs">
       <div class="tb" id="tb">
         <button class="mo" data-t="dewa">Dewa</button><button class="mo" data-t="pos">Posisi</button><button class="mo" data-t="eq">Ekuitas</button>
-        <button data-t="hist">Riwayat</button><button data-t="acc">Akurasi</button><button data-t="val">Uji</button><button data-t="rule">Aturan</button><span class="ind"></span>
+        <button data-t="mtf">Monitor</button><button data-t="hist">Riwayat</button><button data-t="acc">Akurasi</button><button data-t="val">Uji</button><button data-t="rule">Aturan</button><span class="ind"></span>
       </div>
       <div class="body">
         <div class="sec" data-s="dewa" id="mDewa"></div>
         <div class="sec" data-s="pos" id="mPos"></div>
         <div class="sec" data-s="eq" id="mEq"></div>
+        <div class="sec" data-s="mtf" id="sMtf"></div>
         <div class="sec" data-s="hist" id="sHist"></div>
         <div class="sec" data-s="acc" id="sAcc"></div>
         <div class="sec" data-s="val" id="sVal"></div>
@@ -465,8 +490,8 @@ const bU=ln(c1,'rgba(139,149,181,.35)'),bL=ln(c1,'rgba(139,149,181,.35)');
 const mh=c2.addHistogramSeries({priceLineVisible:false,lastValueVisible:false}),mm=ln(c2,'#5b8cff',1.5),msg=ln(c2,'#f2994a',1.5);
 const rs=c3.addLineSeries({color:'#8d7bd6',lineWidth:1.5,priceLineVisible:false});
 const rsl=[70,30].map(v=>rs.createPriceLine({price:v,color:'rgba(139,149,181,.35)',lineWidth:1,lineStyle:2,axisLabelVisible:false}));
-function osc(){ // panel bawah mengikuti osilator yang dipakai entry
-  const e=P.entry==='dewa'?P.base||'':P.entry;
+const osc=()=>oscFor(P.entry==='dewa'?P.base||'':P.entry); // panel bawah mengikuti osilator yang dipakai entry
+function oscFor(e){
   if(e.startsWith('sc_stoch'))return{k:'stk',n:'Stochastic %K 14',lv:e==='sc_stoch5'?[95,5]:[90,10]};
   if(e.startsWith('rsi2')||e==='sw_rsi2')return{k:'rsi2',n:'RSI 2',lv:e==='rsi2_htf3'?[97,3]:e==='rsi2_trend'?[90,10]:[95,5]};
   return{k:'rsi',n:'RSI 14',lv:e==='rsi14_dip'?[65,35]:[70,30]};
@@ -608,6 +633,8 @@ function updCy(){ // perbarui di tempat supaya lebar bar beranimasi
 function cdTick(){
   if(!D.length)return;const s=Math.max(0,Math.floor((D[D.length-1].t+TFMS[S.tf]-Date.now())/1000)),h=Math.floor(s/3600),z=n=>String(n).padStart(2,'0');
   const t='close '+(h?`${h}:${z(Math.floor(s%3600/60))}:${z(s%60)}`:`${z(Math.floor(s/60))}:${z(s%60)}`);document.querySelectorAll('[data-cd]').forEach(e=>e.textContent=t);
+  document.querySelectorAll('[data-cdtf]').forEach(e=>{const tf=e.dataset.cdtf,m=MT[tf];if(!m||!m.d)return;const s=Math.max(0,Math.floor((m.d[m.d.length-1].t+TFMS[tf]-Date.now())/1000)),h=Math.floor(s/3600);
+    e.textContent='close '+(h>=24?Math.floor(h/24)+'h '+h%24+'j':h?`${h}:${z(Math.floor(s%3600/60))}:${z(s%60)}`:`${z(Math.floor(s/60))}:${z(s%60)}`)});
 }
 setInterval(cdTick,1000);
 function posHTML(){
@@ -729,6 +756,89 @@ function accHTML(){
   return hd+h+`</div><div class="lg"><span><b class="g"></b>≥60% & untung</span><span><b class="a"></b>≥60% tapi rugi setelah fee</span><span><b class="r"></b>&lt;60%</span></div>
     <p class="foot">±5000 bar terakhir per TF dari Binance. TP/SL & arah mengikuti preset Scalping (15m–1H, garis biru) atau Swing (4H–1D, garis ungu) di TF itu. Klik kotak untuk memakai kombinasi tersebut.</p>`;
 }
+/* ---------- Monitor multi time frame: bias tren + status sinyal di setiap TF ---------- */
+const TFI=TFS.map(t=>t[0]),BIASF=['Close vs EMA200','EMA50 vs EMA200','EMA20 vs EMA50','Histogram MACD','Close vs EMA800'];
+let MT={},mtSeq=0,mtMode=LS.get('mtm','preset');
+function withCtx(d,Z,p,f){const a=D,b=X,c=P;D=d;X=Z;P=p;try{return f()}finally{D=a;X=b;P=c}}
+function mtParams(tf){
+  if(mtMode==='preset')return presetFor(GRP(tf),tf);
+  const e=P.entry==='dewa'?(P.base&&P.base!=='all'?P.base:'trend200'):P.entry;return Object.assign({},P,{entry:e,per:0});
+}
+function biasOf(Z,i){ // 5 faktor tren, dibaca di bar yang sudah close
+  const c=Z.c[i],f=[c>Z.e200[i],Z.e50[i]>Z.e200[i],Z.e20[i]>Z.e50[i],Z.hi[i]>0,c>Z.e800[i]].map(x=>x?1:-1),s=f.reduce((a,b)=>a+b,0);
+  return{s,f,lab:s===5?'BULLISH KUAT':s===3?'BULLISH':s===1?'NETRAL +':s===-1?'NETRAL −':s===-3?'BEARISH':'BEARISH KUAT',c:s>=3?'l':s<=-3?'s':'n'};
+}
+function mtEval(tf){
+  const m=MT[tf];if(!m||!m.d||m.d.length<300)return null;
+  const d=m.d,n=d.length,cur=tf===S.tf&&d===D&&X,key=[n,d[n-1].c,d[n-1].t,mtMode,mtMode==='ind'?JSON.stringify(P):''].join('|');
+  if(!cur&&m.key===key)return m.r;
+  const Z=cur?X:(m.zk===n+'|'+d[n-1].c?m.Z:(m.Z=calc(d),m.zk=n+'|'+d[n-1].c,m.Z));
+  const p=mtParams(tf),B=backtest(p,0,n,true,Z),i=n-2,l=d[n-1],a=Z.atr[i],pl=withCtx(d,Z,p,plan),O=oscFor(p.entry);
+  let st;const o=B.open;
+  if(o){const dd=o.dir*(l.c-o.entry);st={k:'open',dir:o.dir,o,prog:dd>=0?Math.min(1,dd/Math.abs(o.tp-o.entry)):-Math.min(1,-dd/Math.abs(o.entry-o.sl))}}
+  else if(pl&&pl.now)st={k:'ready',dir:pl.dir,pl};
+  else if(pl)st={k:'plan',dir:pl.dir,pl,dist:Math.abs(l.c-pl.px)/a};
+  else st={k:'wait'};
+  const r={tf,bi:biasOf(Z,i),st,p,O,ov:Z[O.k][i],c:l.c,ch:l.c/l.o-1,wr:B.wr,nt:B.T.length,t:l.t};
+  if(!cur){m.key=key;m.r=r}return r;
+}
+function mtAll(){const R=TFI.map(tf=>{try{return mtEval(tf)}catch(e){return null}});
+  R.forEach((r,k)=>{if(!r||!r.st.dir)return;const hs=R.slice(k+1,k+3).filter(Boolean).reduce((a,x)=>a+x.bi.s,0);r.al=!hs?0:Math.sign(hs)===r.st.dir?1:-1});return R}
+const DIR=d=>d>0?'LONG':'SHORT';
+function mtSum(R){
+  const v=R.filter(Boolean);if(!v.length)return{mk:'Memuat time frame…',ac:''};
+  const L=s=>s.map(r=>TFS.find(t=>t[0]===r.tf)[1]).join(' · ')||'—',bu=v.filter(r=>r.bi.s>=3),be=v.filter(r=>r.bi.s<=-3),ne=v.filter(r=>Math.abs(r.bi.s)<3);
+  const mk=bu.length>=4?`<b class="up">Bullish</b> di ${bu.length}/${v.length} TF`:be.length>=4?`<b class="dn">Bearish</b> di ${be.length}/${v.length} TF`
+    :`<span class="up">Bullish ${L(bu)}</span> · <span class="dn">Bearish ${L(be)}</span>${ne.length?` · <span class="mut">Netral ${L(ne)}</span>`:''}`;
+  const tl=r=>TFS.find(t=>t[0]===r.tf)[1],alT=r=>r.al>0?' · searah TF besar':r.al<0?' · <span class="dn">melawan TF besar</span>':'';
+  const rd=v.filter(r=>r.st.k==='ready'),op=v.filter(r=>r.st.k==='open'),pl=v.filter(r=>r.st.k==='plan').sort((a,b)=>a.st.dist-b.st.dist);
+  let ac;
+  if(rd.length)ac=`<b class="warn">Open ${DIR(rd[0].st.dir)} di ${rd.map(tl).join(', ')}</b> saat bar close${alT(rd[0])}`;
+  else if(op.length)ac=`Posisi ${DIR(op[0].st.dir)} berjalan di <b>${op.map(tl).join(', ')}</b> · ${op[0].st.prog>=0?`${Math.round(op[0].st.prog*100)}% ke TP`:`${Math.round(-op[0].st.prog*100)}% ke SL`}`;
+  else if(pl.length){const r=pl[0];ac=`Terdekat: <b>${tl(r)} ${DIR(r.st.dir)}</b> jika close ${r.st.pl.px<r.c?'≤':'≥'} ${fp(r.st.pl.px)} (${pc(r.st.pl.px/r.c-1)})${alT(r)}`}
+  else ac='<span class="mut">Belum ada sinyal di semua TF</span>';
+  return{mk,ac};
+}
+function stTxt(r,short){
+  const s=r.st;if(s.k==='open')return short?`OPEN ${s.dir>0?'L':'S'} ${Math.round(Math.abs(s.prog)*100)}%`:`<b class="warn">OPEN ${DIR(s.dir)}</b> ${fp(s.o.entry)} · ${s.prog>=0?`<span class="up">${Math.round(s.prog*100)}% ke TP</span>`:`<span class="dn">${Math.round(-s.prog*100)}% ke SL</span>`}`;
+  if(s.k==='ready')return short?`SIAP ${s.dir>0?'L':'S'}`:`<b class="warn">SIAP ${DIR(s.dir)}</b> entry ~${fp(s.pl.px)} · TP ${fp(s.pl.tp)} · SL ${fp(s.pl.sl)}`;
+  if(s.k==='plan')return short?(s.dist<1.5?`DEKAT ${s.dir>0?'L':'S'}`:''):`${DIR(s.dir)} jika close ${s.pl.px<r.c?'≤':'≥'} ${fp(s.pl.px)} <span class="mut">(${pc(s.pl.px/r.c-1)} · ${s.dist.toFixed(1)} ATR)</span>`;
+  return short?'':'<span class="mut">Tunggu sinyal</span>';
+}
+function mtRender(){
+  const R=mtAll(),sm=mtSum(R);
+  $('mtf').innerHTML=R.map((r,k)=>{const [tf,lb]=TFS[k];if(!r)return `<button class="chip" data-tf="${tf}"><b>${lb}</b><span class="mut">…</span></button>`;
+    const st=r.st,sk=st.k==='open'?'open':st.k==='ready'?'ready':st.k==='plan'&&st.dist<1.5?'near':'',tx=stTxt(r,true);
+    return `<button class="chip ${r.bi.c}${tf===S.tf?' on':''}" data-tf="${tf}" title="${lb}: ${r.bi.lab} (${r.bi.s>0?'+':''}${r.bi.s}/5) · ${stTxt(r).replace(/<[^>]+>/g,'')}"><b>${lb}</b><span class="ar ${r.bi.c}">${r.bi.s>=3?'▲':r.bi.s<=-3?'▼':'◆'}</span><span class="bl">${r.bi.s>=3?'Bull':r.bi.s<=-3?'Bear':'Netral'}</span>${tx?`<span class="cs ${sk}">${tx}</span>`:''}</button>`}).join('')
+    +`<span class="sum">${sm.ac}</span>`;
+  $('sMtf').innerHTML=`<div class="hh"><span>Monitor time frame</span><span class="mm"><button data-m="preset" class="${mtMode==='preset'?'on':''}">Preset per TF</button><button data-m="ind" class="${mtMode==='ind'?'on':''}">Indikator aktif</button></span></div>
+    <div class="msum"><div><i>Pasar</i><span>${sm.mk}</span></div><div><i>Aksi</i><span>${sm.ac}</span></div></div>
+    ${R.map((r,k)=>{const [tf,lb]=TFS[k];if(!r)return `<div class="mr" data-tf="${tf}"><b class="tfb">${lb}</b><span class="mut">memuat…</span></div>`;
+      return `<div class="mr${tf===S.tf?' on':''}" data-tf="${tf}"><b class="tfb">${lb}<em>${GRP(tf)==='scalp'?'scalp':'swing'}</em></b>
+        <div class="mc"><div class="ml"><span class="pill ${r.bi.c}">${r.bi.lab}</span><span class="dots" title="${BIASF.map((n,j)=>n+(r.bi.f[j]>0?' ▲':' ▼')).join('\n')}">${r.bi.f.map(x=>`<i class="${x>0?'u':'d'}"></i>`).join('')}</span><span class="mut num">${pc(r.ch)}</span></div>
+        <div class="ms">${stTxt(r)}${r.al<0&&r.st.dir?' <span class="dn">· melawan TF besar</span>':r.al>0&&r.st.dir?' <span class="up">· searah TF besar</span>':''}</div>
+        <div class="mi"><span>${ENTRIES[r.p.entry].s||ENTRIES[r.p.entry].n} · ${r.O.n.replace('Stochastic %K 14','Stoch')} ${r.ov.toFixed(0)}</span><span>WR ${(r.wr*100).toFixed(0)}% (${r.nt}) · <span class="num" data-cdtf="${tf}"></span></span></div></div></div>`}).join('')}
+    <p class="foot">Bias dari 5 faktor di bar terakhir yang sudah close: close vs EMA200, EMA50 vs EMA200, EMA20 vs EMA50, histogram MACD, close vs EMA800 (≥ +3 bullish, ≤ −3 bearish). Status memakai ${mtMode==='preset'?'preset Scalping/Swing milik tiap TF':'indikator & TP/SL yang sedang aktif'}. "Searah TF besar" = bias dua TF di atasnya.</p>`;
+  cdTick();
+}
+async function mtLoad(){
+  const my=++mtSeq,sym=S.sym;
+  for(const tf of TFI){
+    if(my!==mtSeq)return;const key=sym+'|'+tf,c=MXC[key];
+    if(tf===S.tf&&D.length)MT[tf]={d:D};
+    else if(c&&Date.now()-c.t<6e5)MT[tf]={d:c.d};
+    else{try{const d=await loadAll(sym,tf);if(my!==mtSeq)return;MXC[key]={t:Date.now(),d};MT[tf]={d}}catch(e){}}
+    mtRender();
+  }
+}
+async function mtPoll(){ // TF lain diperbarui tiap 20 detik; TF di layar ikut poll utama
+  if(document.hidden)return;const my=mtSeq,sym=S.sym;
+  await Promise.all(TFI.filter(tf=>tf!==S.tf&&MT[tf]&&MT[tf].d).map(async tf=>{try{
+    const r=(await kl(`symbol=${sym}&interval=${tf}&limit=2`)).map(bar);if(my!==mtSeq)return;const d=MT[tf].d;
+    r.forEach(b=>{const L=d[d.length-1];if(b.t===L.t)d[d.length-1]=b;else if(b.t>L.t)d.push(b)})}catch(e){}}));
+  if(my===mtSeq)mtRender();
+}
+setInterval(mtPoll,20000);
 function useCell(e,tf){
   const g=GRP(tf),p=presetFor(g,tf),same=p.entry===e,ch=tf!==S.tf;
   S.preset=same?g:'custom';P=same?p:Object.assign(p,{entry:e});S.tf=tf;presetOpts();markTf();save();
@@ -854,7 +964,7 @@ function plan(){
 }
 function start(){const s0=w0(D.length);if(!P.per)return s0;const t0=D[D.length-1].t-P.per*864e5;const i=D.findIndex(b=>b.t>=t0);return Math.max(i<0?0:i,s0)}
 function recompute(keep,anim){
-  X=calc(D);PL=plan();BT=backtest(P,start(),D.length,true);fill(keep);head();renderPanel(anim);drawOv();
+  X=calc(D);PL=plan();BT=backtest(P,start(),D.length,true);fill(keep);head();renderPanel(anim);drawOv();mtRender();
   dewaRun().then(ch=>{if(!ch)return;if(P.entry==='dewa'){PL=plan();BT=backtest(P,start(),D.length,true);markers();posLines();renderPanel(false)}else renderDewa();drawOv()});
 }
 let PL=null;
@@ -872,7 +982,7 @@ function tick(){
     document.querySelectorAll('#lp').forEach(e=>e.textContent=fp(l.c));
     document.querySelectorAll('#kn').forEach(e=>e.style.left=Math.min(100,Math.max(0,(l.c-lo)/(hi-lo)*100))+'%');
     document.querySelectorAll('[data-c]').forEach(curve)}
-  drawOv();
+  drawOv();mtRender();
 }
 function toEnd(){const n=D.length,w=$('c1').clientWidth,show=Math.max(40,Math.min(160,Math.round(w/8))),ex=S.eye?PH+6:5,r={from:n-show,to:n+ex};[c1,c2,c3].forEach(c=>c.timeScale().setVisibleLogicalRange(r))}
 /* Auto: kembali ke bar terakhir di kanan + skala harga otomatis 100% di semua panel */
@@ -884,7 +994,7 @@ async function load(){
   const my=++seq;document.body.classList.add('busy');clearInterval(pollT);$('err').style.display='none';
   try{
     const d=await loadAll(S.sym,S.tf);if(my!==seq)return;if(d.length<300)throw new Error('data kurang');
-    D=d;lastEq=null;DW=null;dwKey='';HL=null;recompute(false,true);fit();requestAnimationFrame(()=>requestAnimationFrame(toEnd));
+    D=d;lastEq=null;DW=null;dwKey='';HL=null;MXC[S.sym+'|'+S.tf]={t:Date.now(),d:D};const fresh=!Object.keys(MT).length;MT[S.tf]={d:D};recompute(false,true);if(fresh)mtLoad();fit();requestAnimationFrame(()=>requestAnimationFrame(toEnd));
     if(S.tab==='acc'&&(!MX||MX.sym!==S.sym))loadMx();
     $('dot').classList.remove('off');pollT=setInterval(poll,5000);
   }catch(e){$('err').textContent='Gagal memuat data · mencoba lagi';$('err').style.display='block';$('dot').classList.add('off');setTimeout(()=>my===seq&&load(),6000)}
@@ -914,7 +1024,9 @@ function setTab(t){
 const save=()=>{LS.set('s3',S);if(S.preset==='custom')LS.set('custom',P)};
 $('tfs').onclick=e=>{const tf=e.target.dataset.tf;if(!tf)return;if(tf===S.tf){fit();return}
   S.tf=tf;if(S.preset==='scalp'||S.preset==='swing')S.preset=GRP(tf);if(S.preset!=='custom')P=presetFor(S.preset,tf);presetOpts();markTf();save();load()};
-$('sym').onchange=e=>{S.sym=e.target.value;MX=null;save();load()};
+$('sym').onchange=e=>{S.sym=e.target.value;MX=null;MT={};mtSeq++;save();load()};
+$('mtf').onclick=e=>{const b=e.target.closest('[data-tf]');if(b)document.querySelector(`#tfs [data-tf="${b.dataset.tf}"]`).click()};
+$('sMtf').onclick=e=>{const m=e.target.closest('[data-m]');if(m){mtMode=m.dataset.m;LS.set('mtm',mtMode);mtRender();return}const b=e.target.closest('[data-tf]');if(b)document.querySelector(`#tfs [data-tf="${b.dataset.tf}"]`).click()};
 $('preset').onchange=e=>{S.preset=e.target.value;let tfc=false;
   if((S.preset==='scalp'||S.preset==='swing')&&GRP(S.tf)!==S.preset){S.tf=S.preset==='scalp'?'30m':'4h';tfc=true;markTf()}
   if(S.preset!=='custom')P=presetFor(S.preset,S.tf);presetOpts();save();
