@@ -68,8 +68,14 @@ body.busy .chart{opacity:.45;filter:saturate(.6)}
 .tag.s{border-color:var(--dn);box-shadow:0 0 0 3px rgba(239,97,137,.12)}.tag.s b{color:var(--dn)}
 .tag.p{border-style:dashed;border-color:rgba(242,201,76,.55);box-shadow:none;background:rgba(10,15,30,.72)}
 .tag.p.s{border-color:rgba(239,97,137,.55)}
-.end{position:absolute;right:92px;bottom:8px;z-index:5;width:26px;height:26px;border-radius:7px;border:1px solid var(--line2);background:var(--s2);display:grid;place-items:center;opacity:.8;transition:opacity .2s}
-.end:hover{opacity:1}.end svg{width:13px;height:13px;stroke:var(--ink);fill:none;stroke-width:1.8}
+.tag.c{border-color:rgba(139,149,181,.6)}.tag.c b{color:var(--mut)}.tag small.cw{color:var(--warn)}
+.ck{white-space:nowrap;font-size:11px;font-weight:600}
+.zb{position:absolute;right:92px;bottom:8px;z-index:5;display:flex;gap:4px;opacity:.85;transition:opacity .2s}
+.zb:hover{opacity:1}
+.zb button{min-width:28px;height:28px;padding:0 6px;border-radius:7px;border:1px solid var(--line2);background:rgba(20,29,54,.92);display:grid;place-items:center;font-size:11.5px;font-weight:700;transition:background .2s}
+.zb button:hover{background:var(--s3)}
+.zb svg{width:13px;height:13px;stroke:var(--ink);fill:none;stroke-width:1.8}
+
 .err{position:absolute;inset:auto 12px 12px auto;z-index:6;background:var(--s2);border:1px solid var(--dn);border-radius:8px;padding:6px 10px;font-size:12px;display:none}
 
 /* panel */
@@ -261,9 +267,9 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
   .tb button{flex:none;padding:10px 11px 9px}
   .tb .mo{display:block}
   #fitBtn span{display:none}
-  .end{width:32px;height:32px;opacity:.95}
+  .zb button{min-width:32px;height:32px}
   .mx{grid-template-columns:minmax(0,1fr) repeat(5,minmax(38px,52px))}
-  .end{right:84px}
+  .zb{right:84px}
   .pn.b{flex:1.5}.pn.c{display:none}
 }
 @media (max-width:480px){#fitBtn,.seg .gap{display:none}}
@@ -289,7 +295,12 @@ table.vt{width:100%;border-collapse:collapse;font-size:12px}
   <section class="chart">
     <div class="mtf" id="mtf"></div>
     <div class="pn a"><div class="lc" id="c1"></div><canvas id="ov"></canvas><div class="lab" id="lab1"></div><div class="tag" id="tag"></div>
-      <button class="end" id="end" aria-label="Auto" title="Auto: kembali ke bar terakhir & skala harga 100%"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div>
+      <div class="zb" id="zb">
+        <button data-z="out" aria-label="Perkecil" title="Perkecil (lebih banyak bar)"><svg viewBox="0 0 24 24"><path d="M6 12h12"/></svg></button>
+        <button data-z="in" aria-label="Perbesar" title="Perbesar"><svg viewBox="0 0 24 24"><path d="M6 12h12M12 6v12"/></svg></button>
+        <button data-z="all" class="tx" title="Scale to fit: seluruh data muat di layar">Fit</button>
+        <button data-z="auto" id="end" aria-label="Auto" title="Auto: kembali ke bar terakhir & skala harga 100%"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+      </div></div>
     <div class="pn b"><div class="lc" id="c2"></div><div class="lab">MACD 12 26 9</div></div>
     <div class="pn c"><div class="lc" id="c3"></div><div class="lab" id="lab3">RSI 14</div></div>
     <div class="err" id="err"></div>
@@ -370,6 +381,23 @@ const ENTRIES={
   dewa:{n:'Mata Dewa (pola serupa)',r:'Peluang TP sebelum SL dari 40 pola masa lalu paling mirip ≥ ambang, ditambah sinyal dasar',
     f:(X,i)=>{const b=!P.base||P.base==='all'?1:ENTRIES[P.base].f(X,i)>0?1:0;return b&&DW&&DW.PR[i]>=(P.thr||.75)?1:0}},
   trend200:{n:'Tren EMA 20/50/200',r:'Close > EMA200 dan EMA20 > EMA50 · short kebalikannya',f:(X,i)=>X.c[i]>X.e200[i]&&X.e20[i]>X.e50[i]?1:X.c[i]<X.e200[i]&&X.e20[i]<X.e50[i]?-1:0}
+};
+/* Syarat per indikator untuk rencana di chart: inti (bergantung close, dicari levelnya) + filter (tren/ATR).
+   Strategi & backtest tidak berubah — rencana "bersyarat" hanya informasi level; entry tetap butuh semua syarat. */
+const TU=(X,i,s)=>s>0?up(X,i):dw(X,i),TH=(X,i,s)=>s>0?htf(X,i):htfD(X,i),AT=k=>(X,i)=>atrp(X,i)>=k;
+const COND={
+  rsi2_trend:{cn:'RSI2 < 10 / > 90',core:(X,i)=>X.rsi2[i]<10?1:X.rsi2[i]>90?-1:0,req:[['Tren searah',TU]]},
+  rsi2_htf3:{cn:'RSI2 < 3',core:(X,i)=>X.rsi2[i]<3?1:0,req:[['Tren ganda',TH],['ATR ≥ 0,3%',AT(.003)]]},
+  rsi2_htf5:{cn:'RSI2 < 5',core:(X,i)=>X.rsi2[i]<5?1:0,req:[['Tren ganda',TH],['ATR ≥ 0,5%',AT(.005)]]},
+  rsi2_trend5:{cn:'RSI2 < 5 / > 95',core:(X,i)=>X.rsi2[i]<5?1:X.rsi2[i]>95?-1:0,req:[['Tren searah',TU]]},
+  rsi14_dip:{cn:'RSI14 < 35 / > 65',core:(X,i)=>X.rsi[i]<35?1:X.rsi[i]>65?-1:0,req:[['Tren searah',TU]]},
+  bb_trend:{cn:'Close di luar Bollinger',core:(X,i)=>X.c[i]<X.bbl[i]?1:X.c[i]>X.bbu[i]?-1:0,req:[['Tren searah',TU]]},
+  pull_e20:{cn:'Sentuh EMA20',core:(X,i)=>X.l[i]<=X.e20[i]&&X.c[i]>X.e50[i]?1:X.h[i]>=X.e20[i]&&X.c[i]<X.e50[i]?-1:0,req:[['Tren searah',TU]]},
+  sc_stoch10:{cn:'Stoch < 10',core:(X,i)=>X.stk[i]<10?1:0,req:[['Tren ganda',TH],['ATR ≥ 0,5%',AT(.005)]]},
+  sc_stoch5:{cn:'Stoch < 5',core:(X,i)=>X.stk[i]<5?1:0,req:[['Tren ganda',TH],['ATR ≥ 0,5%',AT(.005)]]},
+  sw_rsi2:{cn:'RSI2 < 5 / > 95',core:(X,i)=>X.rsi2[i]<5?1:X.rsi2[i]>95?-1:0,req:[['Tren ganda',TH]]},
+  trend200:{cn:'Close vs EMA200',core:(X,i)=>X.c[i]>X.e200[i]?1:X.c[i]<X.e200[i]?-1:0,req:[['EMA20 vs EMA50',(X,i,s)=>s>0?X.e20[i]>X.e50[i]:X.e20[i]<X.e50[i]]]},
+  sw_dn3:{cn:'3 close turun',core:(X,i)=>X.c[i]<X.c[i-1]&&X.c[i-1]<X.c[i-2]&&X.c[i-2]<X.c[i-3]?1:0,req:[['Close > EMA200',(X,i)=>X.c[i]>X.e200[i]]]}
 };
 const BASE={mg:10,lev:10,fee:.045,cap:10000,lad:false,ladn:2,ladm:100};
 const DEFAULT=Object.assign({},BASE,{entry:'hist_rise',dir:'L',tpk:.5,slk:1,mb:0,per:90});
@@ -504,10 +532,15 @@ const fd=v=>'$'+Math.round(v).toLocaleString('en-US');
 const pc=(v,d=2)=>(v>=0?'+':'−')+Math.abs(v*100).toFixed(d)+'%';
 const dt=t=>{const d=new Date(t+7*36e5),p=n=>String(n).padStart(2,'0');return `${p(d.getUTCDate())}/${p(d.getUTCMonth()+1)} ${p(d.getUTCHours())}:${p(d.getUTCMinutes())}`};
 
+let fillKey='';
 function fill(keep){
   const r=keep?c1.timeScale().getVisibleLogicalRange():null,T=D.map(b=>tz(b.t));
   const prec=D[D.length-1].c>=100?2:D[D.length-1].c>=1?3:5,pf={type:'price',precision:prec,minMove:10**-prec};
   cs.setMarkers([]);
+  /* data baru (TF/simbol lain): kosongkan semua seri dulu. Bila candle diisi saat garis EMA masih membawa waktu TF lama,
+     LWC mengindeks ulang waktu tanpa membersihkan cache pencarian bar → "Value is null" dan candle tidak tergambar. */
+  const fk=S.sym+'|'+S.tf+'|'+D[0].t;
+  if(fk!==fillKey){[cs,eA,eB,eC,bU,bL,mh,mm,msg,rs].forEach(x=>x.setData([]));fillKey=fk}
   cs.applyOptions({priceFormat:pf});
   cs.setData(D.map((b,i)=>({time:T[i],open:b.o,high:b.h,low:b.l,close:b.c})));
   const L=(on,a,from=0)=>on?a.map((v,i)=>({time:T[i],value:v})).slice(from):[];
@@ -570,9 +603,9 @@ function paint(){
   if(!BT.open&&PL){ // zona rencana untuk sinyal berikutnya
     const x0=ts.logicalToCoordinate(last),x1=ts.logicalToCoordinate(last+(S.eye?PH:5)),Y=v=>cs.priceToCoordinate(v);
     if(x0!=null&&x1!=null){const ye=Y(PL.px),yt=Y(PL.tp),yl=Y(PL.sl);
-      if(ye!=null&&yt!=null&&yl!=null){const k=PL.now?.5+.5*Math.sin(now/260):1;
+      if(ye!=null&&yt!=null&&yl!=null){const k=PL.now?.5+.5*Math.sin(now/260):PL.cond?.45:1;
         ox.fillStyle=`rgba(46,196,166,${.07*k+.02})`;ox.fillRect(x0,Math.min(ye,yt),x1-x0,Math.abs(yt-ye));ox.fillStyle=`rgba(239,97,137,${.07*k+.02})`;ox.fillRect(x0,Math.min(ye,yl),x1-x0,Math.abs(yl-ye));
-        ox.lineWidth=1;[[yt,'rgba(46,196,166,.9)','TP'],[ye,'rgba(242,201,76,.95)','ENTRY'],[yl,'rgba(239,97,137,.9)','SL']].forEach(([y,col,t])=>{hl(x0,x1,y,col,[5,4]);ox.fillStyle=col;ox.font='600 10px Inter';ox.textAlign='right';ox.fillText(t,x1-2,y-4);ox.textAlign='left'})}}
+        ox.lineWidth=1;[[yt,'rgba(46,196,166,.9)','TP'],[ye,'rgba(242,201,76,.95)',PL.cond?'ENTRY (bersyarat)':'ENTRY'],[yl,'rgba(239,97,137,.9)','SL']].forEach(([y,col,t])=>{hl(x0,x1,y,col,[5,4]);ox.fillStyle=col;ox.font='600 10px Inter';ox.textAlign='right';ox.fillText(t,x1-2,y-4);ox.textAlign='left'})}}
   }
   if(S.eye&&DW&&DW.L===D.length-2){
     const L=DW.L,c=X.c[L],pts=h=>ts.logicalToCoordinate(L+h),Y=v=>cs.priceToCoordinate(v);
@@ -589,10 +622,10 @@ function paint(){
   ox.restore();
   const o=BT.open,q=o||PL;
   if(q&&xl!=null&&xl>0&&xl<pw+40){
-    const ref=o?o.dir:PL.dir,cmp=PL&&!o?(PL.px<D[last].c?'≤ ':'≥ '):'';
+    const ref=o?o.dir:PL.dir,cmp=PL&&!o?(PL.here?'≈ ':PL.px<D[last].c?'≤ ':'≥ '):'';
     const h=o?`<b>${o.dir>0?'LONG':'SHORT'}</b><span class="num">${fp(o.entry)}</span><small>MARGIN ${Math.round(o.mg*100)}% · ${P.lev}X · TP ${fp(o.tp)} · SL ${fp(o.sl)}</small>`
-      :`<b>${PL.now?'SIAP':'RENCANA'} ${PL.dir>0?'LONG':'SHORT'}</b><span class="num">${PL.now?'':cmp}${fp(PL.px)}</span><small>MARGIN ${P.mg}% · ${P.lev}X · TP ${fp(PL.tp)} · SL ${fp(PL.sl)}</small>`;
-    const cls='tag'+(o?'':' p')+(ref<0?' s':'');if(tg.className!==cls)tg.className=cls;if(tg._h!==h){tg.innerHTML=h;tg._h=h}tg.style.display='block';
+      :`<b>${PL.now?'SIAP':PL.cond?'MENUNGGU':'RENCANA'} ${PL.dir>0?'LONG':'SHORT'}</b><span class="num">${PL.now?'':cmp}${fp(PL.px)}</span><small>MARGIN ${P.mg}% · ${P.lev}X · TP ${fp(PL.tp)} · SL ${fp(PL.sl)}</small>${PL.cond?`<small class="cw">SYARAT: ${PL.miss.join(' · ').toUpperCase()}</small>`:''}`;
+    const cls='tag'+(o?'':' p')+(!o&&PL.cond?' c':'')+(ref<0?' s':'');if(tg.className!==cls)tg.className=cls;if(tg._h!==h){tg.innerHTML=h;tg._h=h}tg.style.display='block';
     const y=cs.priceToCoordinate(o?(o.dir>0?o.tp:o.sl):(PL.dir>0?PL.tp:PL.sl)),w=tg.offsetWidth;
     tg.style.left=Math.min(Math.max(xl-w/2-14,w/2+8),pw-w/2-4)+'px';tg.style.top=Math.max((y==null?50:y)-12,tg.offsetHeight+6)+'px';
   }else tg.style.display='none';
@@ -611,9 +644,11 @@ function cyState(){
     return{ph:2,k,msg:d>=0?`<b class="up">${Math.round(k*100)}%</b> menuju take profit`:`<b class="dn">${Math.round(-k*100)}%</b> menuju stop loss`,sub:`${n-1-o.si} bar berjalan · TP ${fp(o.tp)} · SL ${fp(o.sl)}`}}
   const base={lt,ago};
   if(PL&&PL.now)return Object.assign(base,{ph:1,k:1,msg:`<b class="warn">Open ${PL.dir>0?'LONG':'SHORT'}</b> di open bar berikutnya`,sub:'bila bar ini ditutup di sekitar harga sekarang'});
-  if(PL){const dist=Math.abs(l.c-PL.px)/a;return Object.assign(base,{ph:0,k:Math.max(.04,1-dist/4),msg:`Open ${PL.dir>0?'LONG':'SHORT'} jika close ${PL.px<l.c?'≤':'≥'} <b class="num">${fp(PL.px)}</b>`,sub:`jarak ${pc(PL.px/l.c-1)} · ${dist.toFixed(1)} ATR`})}
-  return Object.assign(base,{ph:0,k:0,msg:'Menunggu sinyal',sub:'belum ada pemicu dalam ±4 ATR'});
+  if(PL){const dist=Math.abs(l.c-PL.px)/a;return Object.assign(base,{ph:0,k:Math.max(.04,1-dist/(PL.cond?10:4))*(PL.cond?.5:1),msg:PL.here?`Level ${PL.dir>0?'LONG':'SHORT'} bila sinyal muncul ≈ <b class="num">${fp(PL.px)}</b>`:`Open ${PL.dir>0?'LONG':'SHORT'} jika close ${PL.px<l.c?'≤':'≥'} <b class="num">${fp(PL.px)}</b>`,
+    sub:`jarak ${pc(PL.px/l.c-1)} · ${dist.toFixed(1)} ATR`+(PL.cond?` · <span class="warn">menunggu: ${PL.miss.join(', ')}</span>`:'')})}
+  return Object.assign(base,{ph:0,k:0,msg:'Menunggu sinyal',sub:CK?ckHTML(CK):'belum ada pemicu dalam ±10 ATR'});
 }
+const ckHTML=L=>L.map(([n,o])=>`<span class="ck ${o?'up':'dn'}">${o?'✓':'✗'} ${n}</span>`).join(' ');
 function cyHTML(){
   const c=cyState(),r=c.ph<2&&c.lt&&c.ago<=6?c.lt:null;
   const st=(cls,lab,sub)=>`<div class="${cls}"><span class="dt"></span><b>${lab}</b><em>${sub}</em></div>`;
@@ -644,8 +679,9 @@ function posHTML(){
     let h=`<div class="hd">Posisi<span>${S.tf.toUpperCase()} · ${PNAME[S.preset]}</span></div>
       ${dl('Status',`<span class="pill n">FLAT</span> &nbsp;sinyal ${sigTxt(g)}`)}`;
     if(PL){const tP=PL.dir*(PL.tp-PL.px)/PL.px,sP=PL.dir*(PL.sl-PL.px)/PL.px;
-      h+=dl('Rencana',`<b class="${PL.dir>0?'up':'dn'}">${PL.dir>0?'LONG':'SHORT'}</b> · ${lev}x · margin ${P.mg}%`)+dl(PL.now?'Entry':'Entry jika close',fp(PL.px))
+      h+=dl(PL.cond?'Rencana <em>bersyarat</em>':'Rencana',`<b class="${PL.dir>0?'up':'dn'}">${PL.dir>0?'LONG':'SHORT'}</b> · ${lev}x · margin ${P.mg}%`)+dl(PL.now?'Entry':PL.here?'Entry ≈':'Entry jika close',fp(PL.px))
         +dl(`Target <em>+${P.tpk}×ATR14</em>`,`<span class="up">${fp(PL.tp)}</span> · ${pc(tP*mg*lev-fe)}`)+dl(`Stop <em>−${P.slk}×ATR14</em>`,`<span class="dn">${fp(PL.sl)}</span> · ${pc(sP*mg*lev-fe)}`)}
+    if(CK)h+=dl('Syarat sekarang',ckHTML(CK));
     h+=dl('ATR',`${fp(a)} (${(a/D[n-2].c*100).toFixed(2)}%)`)+dl('Fee bolak-balik',`<span class="warn">−${(fe*100).toFixed(2)}%</span> <em>${lev}x × ${P.fee}% × 2</em>`);
     return h+`<div class="cy" data-cy>${cyHTML()}</div>`;
   }
@@ -759,7 +795,7 @@ function accHTML(){
 /* ---------- Monitor multi time frame: bias tren + status sinyal di setiap TF ---------- */
 const TFI=TFS.map(t=>t[0]),BIASF=['Close vs EMA200','EMA50 vs EMA200','EMA20 vs EMA50','Histogram MACD','Close vs EMA800'];
 let MT={},mtSeq=0,mtMode=LS.get('mtm','preset');
-function withCtx(d,Z,p,f){const a=D,b=X,c=P;D=d;X=Z;P=p;try{return f()}finally{D=a;X=b;P=c}}
+function withCtx(d,Z,p,f){const a=D,b=X,c=P,k=CK;D=d;X=Z;P=p;try{return f()}finally{D=a;X=b;P=c;CK=k}}
 function mtParams(tf){
   if(mtMode==='preset')return presetFor(GRP(tf),tf);
   const e=P.entry==='dewa'?(P.base&&P.base!=='all'?P.base:'trend200'):P.entry;return Object.assign({},P,{entry:e,per:0});
@@ -776,7 +812,7 @@ function mtEval(tf){
   const p=mtParams(tf),B=backtest(p,0,n,true,Z),i=n-2,l=d[n-1],a=Z.atr[i],pl=withCtx(d,Z,p,plan),O=oscFor(p.entry);
   let st;const o=B.open;
   if(o){const dd=o.dir*(l.c-o.entry);st={k:'open',dir:o.dir,o,prog:dd>=0?Math.min(1,dd/Math.abs(o.tp-o.entry)):-Math.min(1,-dd/Math.abs(o.entry-o.sl))}}
-  else if(pl&&pl.now)st={k:'ready',dir:pl.dir,pl};
+  else if(pl&&pl.now&&!pl.cond)st={k:'ready',dir:pl.dir,pl};
   else if(pl)st={k:'plan',dir:pl.dir,pl,dist:Math.abs(l.c-pl.px)/a};
   else st={k:'wait'};
   const r={tf,bi:biasOf(Z,i),st,p,O,ov:Z[O.k][i],c:l.c,ch:l.c/l.o-1,wr:B.wr,nt:B.T.length,t:l.t};
@@ -791,24 +827,24 @@ function mtSum(R){
   const mk=bu.length>=4?`<b class="up">Bullish</b> di ${bu.length}/${v.length} TF`:be.length>=4?`<b class="dn">Bearish</b> di ${be.length}/${v.length} TF`
     :`<span class="up">Bullish ${L(bu)}</span> · <span class="dn">Bearish ${L(be)}</span>${ne.length?` · <span class="mut">Netral ${L(ne)}</span>`:''}`;
   const tl=r=>TFS.find(t=>t[0]===r.tf)[1],alT=r=>r.al>0?' · searah TF besar':r.al<0?' · <span class="dn">melawan TF besar</span>':'';
-  const rd=v.filter(r=>r.st.k==='ready'),op=v.filter(r=>r.st.k==='open'),pl=v.filter(r=>r.st.k==='plan').sort((a,b)=>a.st.dist-b.st.dist);
+  const rd=v.filter(r=>r.st.k==='ready'),op=v.filter(r=>r.st.k==='open'),pl=v.filter(r=>r.st.k==='plan'&&!r.st.pl.here).sort((a,b)=>(a.st.pl.cond-b.st.pl.cond)||(a.st.dist-b.st.dist));
   let ac;
   if(rd.length)ac=`<b class="warn">Open ${DIR(rd[0].st.dir)} di ${rd.map(tl).join(', ')}</b> saat bar close${alT(rd[0])}`;
   else if(op.length)ac=`Posisi ${DIR(op[0].st.dir)} berjalan di <b>${op.map(tl).join(', ')}</b> · ${op[0].st.prog>=0?`${Math.round(op[0].st.prog*100)}% ke TP`:`${Math.round(-op[0].st.prog*100)}% ke SL`}`;
-  else if(pl.length){const r=pl[0];ac=`Terdekat: <b>${tl(r)} ${DIR(r.st.dir)}</b> jika close ${r.st.pl.px<r.c?'≤':'≥'} ${fp(r.st.pl.px)} (${pc(r.st.pl.px/r.c-1)})${alT(r)}`}
+  else if(pl.length){const r=pl[0];ac=`Terdekat${r.st.pl.cond?' (bersyarat)':''}: <b>${tl(r)} ${DIR(r.st.dir)}</b> jika close ${r.st.pl.px<r.c?'≤':'≥'} ${fp(r.st.pl.px)} (${pc(r.st.pl.px/r.c-1)})${alT(r)}`}
   else ac='<span class="mut">Belum ada sinyal di semua TF</span>';
   return{mk,ac};
 }
 function stTxt(r,short){
   const s=r.st;if(s.k==='open')return short?`OPEN ${s.dir>0?'L':'S'} ${Math.round(Math.abs(s.prog)*100)}%`:`<b class="warn">OPEN ${DIR(s.dir)}</b> ${fp(s.o.entry)} · ${s.prog>=0?`<span class="up">${Math.round(s.prog*100)}% ke TP</span>`:`<span class="dn">${Math.round(-s.prog*100)}% ke SL</span>`}`;
   if(s.k==='ready')return short?`SIAP ${s.dir>0?'L':'S'}`:`<b class="warn">SIAP ${DIR(s.dir)}</b> entry ~${fp(s.pl.px)} · TP ${fp(s.pl.tp)} · SL ${fp(s.pl.sl)}`;
-  if(s.k==='plan')return short?(s.dist<1.5?`DEKAT ${s.dir>0?'L':'S'}`:''):`${DIR(s.dir)} jika close ${s.pl.px<r.c?'≤':'≥'} ${fp(s.pl.px)} <span class="mut">(${pc(s.pl.px/r.c-1)} · ${s.dist.toFixed(1)} ATR)</span>`;
+  if(s.k==='plan')return short?(s.dist<1.5&&!s.pl.cond?`DEKAT ${s.dir>0?'L':'S'}`:''):s.pl.here?`<span class="mut">Tunggu sinyal · level ${DIR(s.dir)} ≈ ${fp(s.pl.px)}</span> <span class="warn">· menunggu: ${s.pl.miss.join(', ')}</span>`:`${DIR(s.dir)} jika close ${s.pl.px<r.c?'≤':'≥'} ${fp(s.pl.px)} <span class="mut">(${pc(s.pl.px/r.c-1)} · ${s.dist.toFixed(1)} ATR)</span>${s.pl.cond?` <span class="warn">· bersyarat: ${s.pl.miss.join(', ')}</span>`:''}`;
   return short?'':'<span class="mut">Tunggu sinyal</span>';
 }
 function mtRender(){
   const R=mtAll(),sm=mtSum(R);
   $('mtf').innerHTML=R.map((r,k)=>{const [tf,lb]=TFS[k];if(!r)return `<button class="chip" data-tf="${tf}"><b>${lb}</b><span class="mut">…</span></button>`;
-    const st=r.st,sk=st.k==='open'?'open':st.k==='ready'?'ready':st.k==='plan'&&st.dist<1.5?'near':'',tx=stTxt(r,true);
+    const st=r.st,sk=st.k==='open'?'open':st.k==='ready'?'ready':st.k==='plan'&&st.dist<1.5&&!st.pl.cond?'near':'',tx=stTxt(r,true);
     return `<button class="chip ${r.bi.c}${tf===S.tf?' on':''}" data-tf="${tf}" title="${lb}: ${r.bi.lab} (${r.bi.s>0?'+':''}${r.bi.s}/5) · ${stTxt(r).replace(/<[^>]+>/g,'')}"><b>${lb}</b><span class="ar ${r.bi.c}">${r.bi.s>=3?'▲':r.bi.s<=-3?'▼':'◆'}</span><span class="bl">${r.bi.s>=3?'Bull':r.bi.s<=-3?'Bear':'Netral'}</span>${tx?`<span class="cs ${sk}">${tx}</span>`:''}</button>`}).join('')
     +`<span class="sum">${sm.ac}</span>`;
   $('sMtf').innerHTML=`<div class="hh"><span>Monitor time frame</span><span class="mm"><button data-m="preset" class="${mtMode==='preset'?'on':''}">Preset per TF</button><button data-m="ind" class="${mtMode==='ind'?'on':''}">Indikator aktif</button></span></div>
@@ -866,8 +902,8 @@ function dewaHTML(){
   const o=BT&&BT.open;
   if(o)pl=`<b class="${o.dir>0?'up':'dn'}">${o.dir>0?'LONG':'SHORT'}</b> aktif di <span class="num">${fp(o.entry)}</span> · TP <span class="num up">${fp(o.tp)}</span> · SL <span class="num dn">${fp(o.sl)}</span>`;
   else if(PL){const gate=P.entry==='dewa'&&!(pr>=(P.thr||.75));
-    pl=`<b class="${PL.dir>0?'up':'dn'}">${PL.dir>0?'LONG':'SHORT'}</b> ${PL.now?'jika bar ini close di sekitar':`jika close ${PL.px<D[D.length-1].c?'≤':'≥'}`} <span class="num">${fp(PL.px)}</span>${PL.now?'':` <span class="mut">(${pc(PL.px/D[D.length-1].c-1)})</span>`}<br>TP <span class="num up">${fp(PL.tp)}</span> · SL <span class="num dn">${fp(PL.sl)}</span>${gate?`<br><span class="mut">Tertahan: peluang ${(pr*100).toFixed(0)}% &lt; ${((P.thr||.75)*100).toFixed(0)}%</span>`:''}`}
-  else pl='<span class="mut">Belum ada level pemicu dalam ±4 ATR.</span>';
+    pl=`<b class="${PL.dir>0?'up':'dn'}">${PL.dir>0?'LONG':'SHORT'}</b> ${PL.now?'jika bar ini close di sekitar':PL.here?'bila sinyal muncul ≈':`jika close ${PL.px<D[D.length-1].c?'≤':'≥'}`} <span class="num">${fp(PL.px)}</span>${PL.now||PL.here?'':` <span class="mut">(${pc(PL.px/D[D.length-1].c-1)})</span>`}<br>TP <span class="num up">${fp(PL.tp)}</span> · SL <span class="num dn">${fp(PL.sl)}</span>${PL.cond?`<br><span class="warn">Bersyarat: ${PL.miss.join(', ')}</span>`:''}${gate?`<br><span class="mut">Tertahan: peluang ${(pr*100).toFixed(0)}% &lt; ${((P.thr||.75)*100).toFixed(0)}%</span>`:''}`}
+  else pl=CK?ckHTML(CK):'<span class="mut">Belum ada level pemicu dalam ±10 ATR.</span>';
   const accT=isNaN(DW.acc)?'—':(DW.acc*100).toFixed(0)+'%';
   return hd+`<div class="dwr"><i>Arah</i><span><span class="pill ${dir[0]}">${dir[1]}</span> <b class="num">${fp(e)}</b> <span class="num ${ch>=0?'up':'dn'}">${pc(ch)}</span></span></div>
     <div class="dwr"><i>Rentang 20–80%</i><b class="num">${fp(lo)} – ${fp(hi)}</b></div>
@@ -954,13 +990,24 @@ function hypo(cH,fn){
   let sm=0,qq=0;for(let j=i-19;j<=i;j++)sm+=X.c[j];const mu=sm/20;for(let j=i-19;j<=i;j++)qq+=(X.c[j]-mu)**2;const sd=Math.sqrt(qq/20);X.bbl[i]=mu-2*sd;X.bbu[i]=mu+2*sd;
   const r=fn(X,i);K.forEach(k=>X[k][i]=sv[k]);return r;
 }
+let CK=null; // daftar syarat di harga sekarang: [[label, terpenuhi]]
 function plan(){
-  const i=D.length-1,c0=D[i].c,a=X.atr[i-1],base=P.entry==='dewa'?(P.base&&P.base!=='all'?ENTRIES[P.base].f:()=>1):ENTRIES[P.entry].f;
-  const fn=(Y,k)=>{const s=base(Y,k);return P.dir==='L'?s>0:s!==0},now=hypo(c0,fn);let best=null;
-  if(!now)for(let k=1;k<=48&&best==null;k++)for(const sg of[-1,1]){const p=c0+sg*k*a/12;if(p>0&&hypo(p,fn)){best=p;break}}
-  const px=now?c0:best;if(px==null)return null;
-  const s=P.dir==='L'?1:(hypo(px,(Y,k)=>base(Y,k))>0?1:-1);
-  return {now,px,dir:s,tp:px+s*P.tpk*a,sl:px-s*P.slk*a};
+  const i=D.length-1,c0=D[i].c,a=X.atr[i-1],eK=P.entry==='dewa'?(P.base&&P.base!=='all'?P.base:null):P.entry;
+  const full=eK?ENTRIES[eK].f:()=>1,C=eK&&COND[eK],ok=s=>P.dir==='L'?s>0:s!==0;
+  const find=f=>{const g=(Y,k)=>ok(f(Y,k));if(hypo(c0,g))return{now:true,px:c0};
+    for(let k=1;k<=120;k++)for(const sg of[-1,1]){const p=c0+sg*k*a/12;if(p>0&&hypo(p,g))return{now:false,px:p}}return null};
+  const dirAt=(f,px)=>P.dir==='L'?1:(hypo(px,(Y,k)=>f(Y,k))>0?1:-1);
+  const sNow=C?(P.dir==='L'?1:(dw(X,i-1)?-1:1)):1;
+  CK=C?[[C.cn,hypo(c0,(Y,k)=>ok(C.core(Y,k)))],...C.req.map(([n,f])=>[n,hypo(c0,(Y,k)=>f(Y,k,sNow))])]:null;
+  let r=find(full),cond=false,miss=[],f=full;
+  if(!r&&C&&(r=find(C.core))){cond=true;f=C.core;const sd=dirAt(C.core,r.px);r.now=false;
+    miss=C.req.filter(([,q])=>!hypo(r.px,(Y,k)=>q(Y,k,sd))).map(q=>q[0]);if(!miss.length)miss=['syarat lain']}
+  if(!r){ // cadangan: syarat inti belum mungkin di bar ini → tampilkan level bila sinyal muncul di harga sekarang
+    const miss0=CK?CK.filter(q=>!q[1]).map(q=>q[0]):[eK?ENTRIES[eK].s||ENTRIES[eK].n:'sinyal dasar'],sd=P.dir==='L'?1:(dw(X,i-1)?-1:1);
+    return {now:false,px:c0,dir:sd,tp:c0+sd*P.tpk*a,sl:c0-sd*P.slk*a,cond:true,miss:miss0.length?miss0:['sinyal dasar'],here:true};
+  }
+  const sd=dirAt(f,r.px);
+  return {now:r.now,px:r.px,dir:sd,tp:r.px+sd*P.tpk*a,sl:r.px-sd*P.slk*a,cond,miss};
 }
 function start(){const s0=w0(D.length);if(!P.per)return s0;const t0=D[D.length-1].t-P.per*864e5;const i=D.findIndex(b=>b.t>=t0);return Math.max(i<0?0:i,s0)}
 function recompute(keep,anim){
@@ -1033,7 +1080,15 @@ $('preset').onchange=e=>{S.preset=e.target.value;let tfc=false;
   if(tfc){load();return}
   document.body.classList.add('busy');setTimeout(()=>{if(D.length)recompute(true,true);document.body.classList.remove('busy')},180)};
 $('tb').onclick=e=>{if(e.target.dataset.t)setTab(e.target.dataset.t)};
-$('end').onclick=fit;$('fitBtn').onclick=fit;$('c1').addEventListener('dblclick',fit);
+$('fitBtn').onclick=fit;
+$('zb').onclick=e=>{const b=e.target.closest('[data-z]');if(!b)return;const z=b.dataset.z;
+  if(z==='auto')return fit();
+  [c1,c2,c3].forEach(c=>c.priceScale('right').applyOptions({autoScale:true}));
+  if(z==='all'){c1.timeScale().fitContent();drawOv();return}
+  const r=c1.timeScale().getVisibleLogicalRange();if(!r)return;const w=Math.min(D.length+60,Math.max(20,(r.to-r.from)*(z==='in'?.7:1.43)));
+  c1.timeScale().setVisibleLogicalRange({from:r.to-w,to:r.to});drawOv()};
+addEventListener('keydown',e=>{if(e.target.closest('input,select,textarea'))return;const k=e.key.toLowerCase(),z=k==='a'?'auto':k==='f'?'all':k==='+'||k==='='?'in':k==='-'?'out':null;
+  if(z&&!e.metaKey&&!e.ctrlKey)$('zb').querySelector(`[data-z="${z}"]`).click()});$('c1').addEventListener('dblclick',fit);
 const onTrade=e=>{const b=e.target.closest('[data-k]');if(b){focusTrade(b.dataset.k)}};
 $('sHist').onclick=onTrade;['cEq','mEq'].forEach(id=>$(id).onclick=onTrade);
 $('sAcc').onclick=e=>{const b=e.target.closest('[data-e]');if(b)useCell(b.dataset.e,b.dataset.tf)};
